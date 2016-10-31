@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ECS521 Project: Escape Game</title>
+</head>
+<body>
+<div style="position: absolute; top:0px; left: 0px">
+    <canvas id = "canvasOne" width = "1000" height = "700"></canvas>
+    <canvas id = "canvasTwo" width = "200" height = "350"></canvas>
+</div>
+
+<script type="text/javascript">
+    /**
+     * Screen 0: start screen
+     * 1: basic living room view
+     * 2: up close puzzle view
+     * 3: up close portrait painting view
+     * 4: up close desk drawer view
+     * 5: up close xylophone view
+     * 6: hallway view
+     * 7: up close closed bedroom door
+     * 8: up close open bedroom door
+     * 9: winning screen
+     * 10: death by monster screen
+     * 11: death by timer screen
+     */
+    var currentScreen = 0;
+    var timer = 0;
+
+    function init() {
+        var canvas = document.getElementById("canvasOne");
+        var context = canvas.getContext("2d");
+        var imageObj=new Image();
+        imageObj.onload=function() {
+            context.drawImage(this, 0, 0, this.width, this.height,     // source rectangle
+                0, 0, canvas.width, canvas.height); // destination rectangle
+        };
+        imageObj.src="./images/SCREEN1.png";
+    }
+
+    function startGame() {
+        // TODO: DRAW TOOLBAR AND TIMER AND BEGIN TIMER COUNTDOWN
+
+
+    }
+
+    function continueGame() {
+        if (currentScreen == 0) {
+            init();
+        } else if (currentScreen == 1) {
+
+        }
+    }
+
+    window.onload = function() {
+
+    }
+</script>
+
+</body>
+</html>
