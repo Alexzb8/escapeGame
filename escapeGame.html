@@ -78,6 +78,14 @@ body{
 		context.fillText("loading...", 40, 140);
 		
 		loadImage("SCREEN1");
+		loadImage("SCREENGAMEOVER");
+		loadImage("SCREENMONSTER");
+		loadImage("SCREENWIN");
+		loadImage("opendoor");
+		loadImage("monster");
+		loadImage("livingroom");
+		loadImage("hallway");
+		loadImage("closeddoor");
     }
 
     function startGame() {
@@ -91,67 +99,35 @@ body{
 			if(finishedLoading){
 				context.drawImage(images["SCREEN1"], 0, 0, canvas.width, canvas.height);
 			}
-        } else if (currentScreen == 1) {    
+        } else if (currentScreen == 1) {
 
         }
     }
 	
 
-    function drawHallway() {
-        var canvas = document.getElementById("canvasOne");
-        var context = canvas.getContext("2d");
-        var imageObj=new Image();
-        imageObj.onload=function() {
-            context.drawImage(this, 0, 0, this.width, this.height,
-                0, 0, canvas.width, canvas.height);
-        };
-        imageObj.src="./images/hallway.png";
+    function drawHallway(canvas,context) {
+            context.drawImage(images["hallway"], 0, 0,canvas.width, canvas.height);
     }
 
     // if they click on the door AFTER they are inside the hallway
-    function drawUpCloseBedroomDoor() {
-        var canvas = document.getElementById("canvasOne");
-        var context = canvas.getContext("2d");
-        var imageObj=new Image();
-        imageObj.onload=function() {
-            context.drawImage(this, 0, 0, this.width, this.height,
-                0, 0, canvas.width, canvas.height);
-        };
-        imageObj.src="./images/deathdoor.png";
+    function drawUpCloseBedroomDoor(canvas,context) {
+		context.drawImage(images["deathdoor"], 0, 0, canvas.width, canvas.height);
     }
 
     // if they click on the bedroom door AFTER they are at the close up view (not if they are just inside the hallway still)
-    function attemptUnlockUpCloseBedroomDoor() {
+    function attemptUnlockUpCloseBedroomDoor(canvas,context) {
         if (hasBedroomKey && hasWeapon) {
-            var canvas = document.getElementById("canvasOne");
-            var context = canvas.getContext("2d");
-            var imageObj=new Image();
-            imageObj.onload=function() {
-                context.drawImage(this, 0, 0, this.width, this.height,
-                    0, 0, canvas.width, canvas.height);
-            };
-            imageObj.src="./images/openeddoor.png";
+                context.drawImage(images["opendoor"], 0, 0, canvas.width, canvas.height);
 
             // then play the video of beating the monster and getting the key
         } else if (hasBedroomKey && ! hasWeapon) {
-            var canvas = document.getElementById("canvasOne");
-            var context = canvas.getContext("2d");
-            var imageObj = new Image();
-            imageObj.onload = function () {
-                context.drawImage(this, 0, 0, this.width, this.height,
-                    0, 0, canvas.width, canvas.height);
-            };
-            imageObj.src = "./images/monster.png";
+            context.drawImage(images["monster"], 0, 0, canvas.width, canvas.height);
 
             // then play the video of getting killed by the monster
 
             // then take user to end screen
-            var endScreen=new Image();
-            imageObj.onload=function() {
-                context.drawImage(this, 0, 0, this.width, this.height,
-                    0, 0, canvas.width, canvas.height);
-            };
-            imageObj.src="./images/SCREENMONSTER.png";
+			context.drawImage(images["SCREENMONSTER"], 0, 0, canvas.width, canvas.height);
+            
 
         } else {
             // play some kind of "locked door" sound, display text of "door is locked"
@@ -159,16 +135,8 @@ body{
     }
 
     // return to living room
-    function {
-        var canvas = document.getElementById("canvasOne");
-        var context = canvas.getContext("2d");
-        var imageObj = new Image();
-        imageObj.onload = function () {
-            context.drawImage(this, 0, 0, this.width, this.height,
-                0, 0, canvas.width, canvas.height);
-        };
-        imageObj.src = "./images/backgrounddone.png";
-
+    function drawLivingRoom(){
+        context.drawImage(images["livingroom"], 0, 0, canvas.width, canvas.height);
     }
 
     window.onload = function() {
