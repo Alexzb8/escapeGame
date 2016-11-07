@@ -52,6 +52,8 @@ body{
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
 	var images = {};
+	var hasBedroomKey = false; // until they get it from the portrait
+    var hasWeapon = false; // until they get the fire poker
 
 	function loadImage(name) {
 		images[name] = new Image();
@@ -89,9 +91,84 @@ body{
 			if(finishedLoading){
 				context.drawImage(images["SCREEN1"], 0, 0, canvas.width, canvas.height);
 			}
-        } else if (currentScreen == 1) {
+        } else if (currentScreen == 1) {    
 
         }
+    }
+	
+
+    function drawHallway() {
+        var canvas = document.getElementById("canvasOne");
+        var context = canvas.getContext("2d");
+        var imageObj=new Image();
+        imageObj.onload=function() {
+            context.drawImage(this, 0, 0, this.width, this.height,
+                0, 0, canvas.width, canvas.height);
+        };
+        imageObj.src="./images/hallway.png";
+    }
+
+    // if they click on the door AFTER they are inside the hallway
+    function drawUpCloseBedroomDoor() {
+        var canvas = document.getElementById("canvasOne");
+        var context = canvas.getContext("2d");
+        var imageObj=new Image();
+        imageObj.onload=function() {
+            context.drawImage(this, 0, 0, this.width, this.height,
+                0, 0, canvas.width, canvas.height);
+        };
+        imageObj.src="./images/deathdoor.png";
+    }
+
+    // if they click on the bedroom door AFTER they are at the close up view (not if they are just inside the hallway still)
+    function attemptUnlockUpCloseBedroomDoor() {
+        if (hasBedroomKey && hasWeapon) {
+            var canvas = document.getElementById("canvasOne");
+            var context = canvas.getContext("2d");
+            var imageObj=new Image();
+            imageObj.onload=function() {
+                context.drawImage(this, 0, 0, this.width, this.height,
+                    0, 0, canvas.width, canvas.height);
+            };
+            imageObj.src="./images/openeddoor.png";
+
+            // then play the video of beating the monster and getting the key
+        } else if (hasBedroomKey && ! hasWeapon) {
+            var canvas = document.getElementById("canvasOne");
+            var context = canvas.getContext("2d");
+            var imageObj = new Image();
+            imageObj.onload = function () {
+                context.drawImage(this, 0, 0, this.width, this.height,
+                    0, 0, canvas.width, canvas.height);
+            };
+            imageObj.src = "./images/monster.png";
+
+            // then play the video of getting killed by the monster
+
+            // then take user to end screen
+            var endScreen=new Image();
+            imageObj.onload=function() {
+                context.drawImage(this, 0, 0, this.width, this.height,
+                    0, 0, canvas.width, canvas.height);
+            };
+            imageObj.src="./images/SCREENMONSTER.png";
+
+        } else {
+            // play some kind of "locked door" sound, display text of "door is locked"
+        }
+    }
+
+    // return to living room
+    function {
+        var canvas = document.getElementById("canvasOne");
+        var context = canvas.getContext("2d");
+        var imageObj = new Image();
+        imageObj.onload = function () {
+            context.drawImage(this, 0, 0, this.width, this.height,
+                0, 0, canvas.width, canvas.height);
+        };
+        imageObj.src = "./images/backgrounddone.png";
+
     }
 
     window.onload = function() {
@@ -110,8 +187,7 @@ body{
 			
 		});
 		anim.start();
-
-    }
+	}
 </script>
 
 </body>
