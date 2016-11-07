@@ -3,13 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>ECS521 Project: Escape Game</title>
+<style>
+body{
+	background-color:black;
+	margin: 0;
+}
+#game{
+	display:block;
+	width :1200px;
+	margin-left: auto;
+	margin-right: auto;
+}
+#canvasOne{
+	margin:0;
+}
+#canvasTwo{
+	background-color:white;
+	margin:0;
+	position: relative;
+	top:-350px;
+}
+</style>
 </head>
 <body>
-<div style="position: absolute; top:0px; left: 0px">
-    <canvas id = "canvasOne" width = "1000" height = "700"></canvas>
-    <canvas id = "canvasTwo" width = "200" height = "350"></canvas>
+<div id="game">
+	<canvas id = "canvasTwo" width = "200" height = "350"></canvas
+    ><canvas id = "canvasOne" width = "1000" height = "700"></canvas>
 </div>
-
+<script type="text/javascript" src="Animation.js"></script>
 <script type="text/javascript">
     /**
      * Screen 0: start screen
@@ -27,33 +48,68 @@
      */
     var currentScreen = 0;
     var timer = 0;
+	var totalResources = 1;
+	var numResourcesLoaded = 0;
+	var finishedLoading = false;
+	var images = {};
 
+	function loadImage(name) {
+		images[name] = new Image();
+		images[name].onload = function() {
+			resourceLoaded();
+		}
+		images[name].src = "./images/" + name + ".png";
+	}
+	function resourceLoaded() {
+
+		numResourcesLoaded += 1;
+		if(numResourcesLoaded === totalResources) {
+			finishedLoading = true;
+		}
+	}
     function init() {
         var canvas = document.getElementById("canvasOne");
         var context = canvas.getContext("2d");
-        var imageObj=new Image();
-        imageObj.onload=function() {
-            context.drawImage(this, 0, 0, this.width, this.height,     // source rectangle
-                0, 0, canvas.width, canvas.height); // destination rectangle
-        };
-        imageObj.src="./images/SCREEN1.png";
+		
+		context.fillStyle="white";
+		context.font = "100px Georgia";
+		context.fillText("loading...", 40, 140);
+		
+		loadImage("SCREEN1");
     }
 
     function startGame() {
         // TODO: DRAW TOOLBAR AND TIMER AND BEGIN TIMER COUNTDOWN
-
-
+		
+		
     }
 
-    function continueGame() {
-        if (currentScreen == 0) {
-            init();
+    function continueGame(canvas,context) {
+        if (currentScreen == 0) {            
+			if(finishedLoading){
+				context.drawImage(images["SCREEN1"], 0, 0, canvas.width, canvas.height);
+			}
         } else if (currentScreen == 1) {
 
         }
     }
 
     window.onload = function() {
+		var anim = new Animation("canvasOne");
+		var anim2 = new Animation("canvasTwo");
+		var canvas = anim.getCanvas();
+		var canvas2 = anim2.getCanvas();
+		var context = anim.getContext();
+		var context2 = anim2.getContext();
+		init();
+		
+		anim.setStage(function() {
+			
+			this.clear();
+			continueGame(canvas,context);
+			
+		});
+		anim.start();
 
     }
 </script>
