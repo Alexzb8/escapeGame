@@ -75,10 +75,11 @@ Events.prototype.listen = function() {
         that.reset(evt);
     }, false);
     this.canvas.addEventListener("mouseover", function (evt) {
-        that.reset(evt);
+		that.reset(evt);
     }, false);
     this.canvas.addEventListener("mouseout", function (evt) {
-        that.mousePos = null;
+		that.mousePos = null;
+		
     }, false);
 };
 Events.prototype.getMousePos = function(evt){

@@ -20,17 +20,15 @@ body{
 #canvasTwo{
 	background-color:white;
 	margin:0;
-	position: relative;
-	top:-350px;
 }
 </style>
 </head>
 <body>
 <div id="game">
-	<canvas id = "canvasTwo" width = "200" height = "350"></canvas
+	<canvas id = "canvasTwo" width = "200" height = "700"></canvas
     ><canvas id = "canvasOne" width = "1000" height = "700"></canvas>
 </div>
-<script type="text/javascript" src="Animation.js"></script>
+<script type="text/javascript" src="Events.js"></script>
 <script type="text/javascript">
     /**
      * Screen 0: start screen
@@ -40,11 +38,10 @@ body{
      * 4: up close desk drawer view
      * 5: up close xylophone view
      * 6: hallway view
-     * 7: up close closed bedroom door
-     * 8: up close open bedroom door
-     * 9: winning screen
-     * 10: death by monster screen
-     * 11: death by timer screen
+     * 7: up close bedroom door
+     * 8: winning screen
+     * 9: death by monster screen
+     * 10: death by timer screen
      */
     var currentScreen = 0;
     var timer = 0;
@@ -69,9 +66,9 @@ body{
 			finishedLoading = true;
 		}
 	}
-    function init() {
-        var canvas = document.getElementById("canvasOne");
-        var context = canvas.getContext("2d");
+    function init(events) {
+        var canvas = events.getCanvas();
+        var context = events.getContext();
 		
 		context.fillStyle="white";
 		context.font = "100px Georgia";
@@ -86,33 +83,85 @@ body{
 		loadImage("livingroom");
 		loadImage("hallway");
 		loadImage("closeddoor");
-    }
-
-    function startGame() {
-        // TODO: DRAW TOOLBAR AND TIMER AND BEGIN TIMER COUNTDOWN
 		
-		
-    }
-
-    function continueGame(canvas,context) {
-        if (currentScreen == 0) {            
+		var checkloaded = setInterval(function(){
 			if(finishedLoading){
-				context.drawImage(images["SCREEN1"], 0, 0, canvas.width, canvas.height);
+				clearInterval(checkloaded);
+				continueGame(events);
 			}
-        } else if (currentScreen == 1) {
+		},1);
+    }
+    function changeScreen(screen,events){
+		var clone = events.canvas.cloneNode();
+		while (events.canvas.firstChild) {
+		  clone.appendChild(events.canvas.lastChild);
+		}
+		events.canvas.parentNode.replaceChild(clone, events.canvas);
+		currentScreen = screen;
+		console.log("to screen: " + screen);
+		continueGame(events);	
+	}
+	function createEventBox(x,y,width,height,screen,events){
+		events.beginRegion();
+		events.context.beginPath();
+		events.context.rect(x, y, width, height);
+		events.context.lineWidth = 4;
+		events.context.strokeStyle = "black";
+		events.context.fillStyle = "#00D2FF";
+		events.context.fill();
+		events.context.stroke();
+		events.context.closePath();
+		events.addRegionEventListener("mousedown",function(){
+			changeScreen(screen,events);
+		});
+		events.closeRegion();
+	}
+	
+	
+	function continueGame(events) {
+
+		events = new Events("canvasOne");
+	
+        if (currentScreen == 0) {
+			events.setStage(function () {
+				this.clear();
+				events.context.drawImage(images["SCREEN1"], 0, 0, events.canvas.width, events.canvas.height);
+				createEventBox(270,430,460,222,1,events);	
+			});
+        } 
+		else if (currentScreen == 1) {
+		
+			events.setStage(function () {
+				this.clear();
+				events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+				createEventBox(0,0,100,50,0,events);
+				createEventBox(880,0,120,250,6,events);
+			});
+
+        }
+		else if (currentScreen == 6) {
+		
+			events.setStage(function () {
+				this.clear();
+				events.context.drawImage(images["hallway"], 0, 0, events.canvas.width, events.canvas.height);
+				createEventBox(0,0,100,50,0,events);
+				createEventBox(0,450,430,250,1,events);	
+				createEventBox(800,0,200,300,7,events);	
+			});
+
+        }
+		else if (currentScreen == 7) {
+		
+			events.setStage(function () {
+				this.clear();
+				events.context.drawImage(images["closeddoor"], 0, 0, events.canvas.width, events.canvas.height);
+				createEventBox(0,0,100,50,0,events);
+				createEventBox(0,450,430,250,6,events);	
+			});
 
         }
     }
 	
-
-    function drawHallway(canvas,context) {
-            context.drawImage(images["hallway"], 0, 0,canvas.width, canvas.height);
-    }
-
-    // if they click on the door AFTER they are inside the hallway
-    function drawUpCloseBedroomDoor(canvas,context) {
-		context.drawImage(images["deathdoor"], 0, 0, canvas.width, canvas.height);
-    }
 
     // if they click on the bedroom door AFTER they are at the close up view (not if they are just inside the hallway still)
     function attemptUnlockUpCloseBedroomDoor(canvas,context) {
@@ -134,27 +183,13 @@ body{
         }
     }
 
-    // return to living room
-    function drawLivingRoom(){
-        context.drawImage(images["livingroom"], 0, 0, canvas.width, canvas.height);
-    }
 
     window.onload = function() {
-		var anim = new Animation("canvasOne");
-		var anim2 = new Animation("canvasTwo");
-		var canvas = anim.getCanvas();
-		var canvas2 = anim2.getCanvas();
-		var context = anim.getContext();
-		var context2 = anim2.getContext();
-		init();
+		var events = new Events("canvasOne");
 		
-		anim.setStage(function() {
-			
-			this.clear();
-			continueGame(canvas,context);
-			
-		});
-		anim.start();
+		init(events);
+		
+		
 	}
 </script>
 
