@@ -54,13 +54,21 @@ body{
      */
     var currentScreen = 0;
     var timer = 0;
-	var totalResources = 9;
+	var totalResources = 12;
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
 	var images = {};
 	var hasBedroomKey = false; // until they get it from the portrait
     var hasWeapon = false; // until they get the fire poker
 
+	// Returns a random integer between min (included) and max (included)
+	// Using Math.round() will give you a non-uniform distribution!
+	function random(min, max) {
+	  min = Math.ceil(min);
+	  max = Math.floor(max);
+	  return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+	
 	function loadImage(name) {
 		//add image to images array and check if loaded
 		images[name] = new Image();
@@ -95,6 +103,9 @@ body{
 		loadImage("livingroom");
 		loadImage("hallway");
 		loadImage("closeddoor");
+		loadImage("fire1");
+		loadImage("fire2");
+		loadImage("fire3");
 		
 		//check if images are loaded on interval of 1 ms
 		var checkloaded = setInterval(function(){
@@ -138,17 +149,41 @@ body{
 		events = new Events("canvasOne");
 	
         if (currentScreen == 0) {
-			events.setStage(function () {
+			events.setStage(function () {				
 				this.clear();
 				events.context.drawImage(images["SCREEN1"], 0, 0, events.canvas.width, events.canvas.height);
 				createEventBox(270,430,460,222,1,events);	
 			});
         } 
 		else if (currentScreen == 1) {
+			var fireCount = 1;
+			
+			//draw fireplace
+			var fireplace = setInterval(function(){
+				
+				if(currentScreen!=1){
+					clearInterval(fireplace); //end loop
+				}
+				events.clear();
+				events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+				
+				events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
+				fireCount++;
+				if(fireCount==4){
+					fireCount=1;
+				}
+				
+					
+				
+			},100);
+			
+			
 		
 			events.setStage(function () {
-				this.clear();
-				events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+				//events.clear();
+				//events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+				//events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
+				
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(880,0,120,250,6,events);
 			});
