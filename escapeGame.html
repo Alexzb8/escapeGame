@@ -54,7 +54,7 @@ body{
      */
     var currentScreen = 0;
     var timer = 0;
-	var totalResources = 12;
+	var totalResources = 13;
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
 	var images = {};
@@ -106,6 +106,7 @@ body{
 		loadImage("fire1");
 		loadImage("fire2");
 		loadImage("fire3");
+		loadImage("xylophone");
 		
 		//check if images are loaded on interval of 1 ms
 		var checkloaded = setInterval(function(){
@@ -143,6 +144,11 @@ body{
 		events.closeRegion();
 	}
 	
+	function checkregion(mouse){
+		if()
+		
+	}
+	
 	
 	function continueGame(events) {
 
@@ -166,6 +172,8 @@ body{
 				}
 				events.clear();
 				events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+				if(hasweapon)
+				
 				
 				events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
 				fireCount++;
@@ -185,7 +193,9 @@ body{
 				//events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
 				
 				createEventBox(0,0,100,50,0,events);
-				createEventBox(880,0,120,250,6,events);
+				createEventBox(880,0,120,350,6,events);
+				createEventBox(880,0,120,350,6,events);
+				createEventBox(500,0,100,100,5,events);
 			});
 
         }
@@ -193,7 +203,7 @@ body{
 		
 			events.setStage(function () {
 				this.clear();
-				events.context.drawImage(images["hallway"], 0, 0, events.canvas.width, events.canvas.height);
+				events.context.drawImage(images["hallway"], 0, 0, events.canvas.width-200, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(0,450,430,250,1,events);	
 				createEventBox(670,40,200,550,7,events);	
@@ -207,6 +217,14 @@ body{
 				events.context.drawImage(images["closeddoor"], 0, 0, events.canvas.width, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(0,550,1000,150,6,events);	
+			});
+
+        }
+		else if (currentScreen == 5) {
+		
+			events.setStage(function () {
+				this.clear();
+				events.context.drawImage(images["xylophone"], 0, 0, events.canvas.width, events.canvas.height);	
 			});
 
         }
