@@ -35,11 +35,11 @@ body{
 	 * Add audio file loader
 	 * play ambient audio file
 	 * add object close ups
-	 * 
-	 
-	 
-	 
-	 
+	 *
+
+
+
+
      * Screen 0: start screen
      * 1: basic living room view
      * 2: up close puzzle view
@@ -68,7 +68,7 @@ body{
 	  max = Math.floor(max);
 	  return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
-	
+
 	function loadImage(name) {
 		//add image to images array and check if loaded
 		images[name] = new Image();
@@ -87,12 +87,12 @@ body{
     function init(events) {
         var canvas = events.getCanvas();
         var context = events.getContext();
-		
+
 		//loading prompt for user
 		context.fillStyle="white";
 		context.font = "100px Georgia";
 		context.fillText("loading...", 40, 140);
-		
+
 		//load images
 		loadImage("SCREEN1");
 		loadImage("SCREENGAMEOVER");
@@ -107,7 +107,7 @@ body{
 		loadImage("fire2");
 		loadImage("fire3");
 		loadImage("xylophone");
-		
+
 		//check if images are loaded on interval of 1 ms
 		var checkloaded = setInterval(function(){
 			if(finishedLoading){
@@ -126,7 +126,7 @@ body{
 		//change screen and continue game
 		currentScreen = screen;
 		console.log("to screen: " + screen);
-		continueGame(events);	
+		continueGame(events);
 	}
 	function createEventBox(x,y,width,height,screen,events){
 		events.beginRegion();
@@ -143,55 +143,54 @@ body{
 		});
 		events.closeRegion();
 	}
-	
+
 	function checkregion(mouse){
-		if()
-		
+
 	}
-	
-	
+
+
 	function continueGame(events) {
 
 		events = new Events("canvasOne");
-	
+
         if (currentScreen == 0) {
-			events.setStage(function () {				
+			events.setStage(function () {
 				this.clear();
 				events.context.drawImage(images["SCREEN1"], 0, 0, events.canvas.width, events.canvas.height);
-				createEventBox(270,430,460,222,1,events);	
+				createEventBox(270,430,460,222,1,events);
 			});
-        } 
+        }
 		else if (currentScreen == 1) {
 			var fireCount = 1;
-			
+
 			//draw fireplace
 			var fireplace = setInterval(function(){
-				
+
 				if(currentScreen!=1){
 					clearInterval(fireplace); //end loop
 				}
 				events.clear();
 				events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
-				if(hasweapon)
-				
-				
+				if(hasWeapon){}
+
+
 				events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
 				fireCount++;
 				if(fireCount==4){
 					fireCount=1;
 				}
-				
-					
-				
+
+
+
 			},100);
-			
-			
-		
+
+
+
 			events.setStage(function () {
 				//events.clear();
 				//events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
 				//events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
-				
+
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(880,0,120,350,6,events);
 				createEventBox(880,0,120,350,6,events);
@@ -200,36 +199,80 @@ body{
 
         }
 		else if (currentScreen == 6) {
-		
+
 			events.setStage(function () {
 				this.clear();
 				events.context.drawImage(images["hallway"], 0, 0, events.canvas.width-200, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
-				createEventBox(0,450,430,250,1,events);	
-				createEventBox(670,40,200,550,7,events);	
+				createEventBox(0,450,430,250,1,events);
+				createEventBox(670,40,200,550,7,events);
 			});
 
         }
 		else if (currentScreen == 7) {
-		
+
 			events.setStage(function () {
 				this.clear();
 				events.context.drawImage(images["closeddoor"], 0, 0, events.canvas.width, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
-				createEventBox(0,550,1000,150,6,events);	
+				createEventBox(0,550,1000,150,6,events);
 			});
 
         }
 		else if (currentScreen == 5) {
-		
+
 			events.setStage(function () {
 				this.clear();
-				events.context.drawImage(images["xylophone"], 0, 0, events.canvas.width, events.canvas.height);	
+				events.context.drawImage(images["xylophone"], 0, 0, events.canvas.width, events.canvas.height);
 			});
 
+            var canvas = document.getElementById("canvasOne");
+            var canvasPos = getPosition(canvas);
+            var cursorX = 0;
+            var cursorY = 0;
+
+            canvas.addEventListener("mousemove", setCursor, false);
+            drawStick();
+
+            function getPosition(element) {
+                var xPosition = 0;
+                var yPosition = 0;
+
+                while (element) {
+                    xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+                    yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+                    element = element.offsetParent;
+                }
+                return {
+                    x: xPosition,
+                    y: yPosition
+                };
+            }
+
+            function setCursor(event) {
+                console.log("moved!!");
+                cursorX = event.clientX - canvasPos.x;
+                cursorY = event.clientY - canvasPos.y;
+            }
+
+            function drawStick() {
+                events.context.beginPath();
+                events.context.arc(cursorX, cursorY, 30, 0, 2 * Math.PI, true);
+                events.context.fillStyle = "#FF6A6A";
+                events.context.strokeStyle = "#FF6A6A";
+                events.context.lineWidth = 5;
+                events.context.closePath();
+                events.context.fill();
+
+                events.context.beginPath();
+                events.context.moveTo(cursorX + 15, cursorY + 15);
+                events.context.lineTo(cursorX + 120, cursorY + 120);
+                events.context.stroke();
+                requestAnimationFrame(drawStick);
+            }
         }
     }
-	
+
 
     // if they click on the bedroom door AFTER they are at the close up view (not if they are just inside the hallway still)
     function attemptUnlockUpCloseBedroomDoor(canvas,context) {
@@ -244,7 +287,7 @@ body{
 
             // then take user to end screen
 			context.drawImage(images["SCREENMONSTER"], 0, 0, canvas.width, canvas.height);
-            
+
 
         } else {
             // play some kind of "locked door" sound, display text of "door is locked"
@@ -254,10 +297,10 @@ body{
 
     window.onload = function() {
 		var events = new Events("canvasOne");
-		
+
 		init(events);
-		
-		
+
+
 	}
 </script>
 
