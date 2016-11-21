@@ -52,7 +52,7 @@ body{
      * 8: winning screen
      * 9: death by monster screen
      * 10: death by timer screen
-	    11: LAMP TOGGLE
+	   11: LAMP TOGGLE
      */
     var currentScreen = 0;
     var timer = 0;
@@ -111,15 +111,12 @@ body{
 		loadImage("fire2");
 		loadImage("fire3");
 		loadImage("xylophone");
-<<<<<<< HEAD
 		loadImage("table");
 		for(i=0;i<9;i++){
-		loadImage(i);
+			loadImage(i);
 		}
-=======
         loadImage("lamplightingafter");
         loadImage("lampwithoutstick");
->>>>>>> origin/master
 
 		//check if images are loaded on interval of 1 ms
 		var checkloaded = setInterval(function(){
@@ -177,8 +174,6 @@ body{
 	function checkregion(mouse){
 
 	}
-
-
 	function continueGame(events) {
 
 		events = new Events("canvasOne");
@@ -229,13 +224,10 @@ body{
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(880,0,120,350,6,events);
 				createEventBox(880,0,120,350,6,events);
-<<<<<<< HEAD
 				createEventBox(0,400,100,200,5,events);
 				createEventBox(400,380,220,120,2,events);
-=======
 				createEventBox(100,400,100,100,5,events);
                 createEventBox(375, 20, 80, 80, 1, events);
->>>>>>> origin/master
 			});
 
         }
