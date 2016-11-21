@@ -149,25 +149,22 @@ body{
 		events.context.stroke();
 		events.context.closePath();
 		events.addRegionEventListener("mousedown",function(){
-			if(screen==11){
-				
-				changeScreen(screen,events);
+			if (screen==11){
+				console.log("click on lamp");
+				lampOn = !lampOn;
+				changeScreen(1,events);
 			}
-			else{
-		
+			else {
 			changeScreen(screen,events);
-			}
-			
-			
-			
+			}			
 		});
 		events.addRegionEventListener("mouseout", function () {
 			document.body.style.cursor = "default";
-			console.log("mouseout");
+			//console.log("mouseout");
 		});
 		events.addRegionEventListener("mouseover", function () {
 			document.body.style.cursor = "pointer";
-			console.log("mouseover");
+			//console.log("mouseover");
 		});
 		events.closeRegion();
 	}
@@ -186,6 +183,7 @@ body{
 			});
         }
 		else if (currentScreen == 1) {
+			console.log("lampon: "+lampOn+"  hasStick : "+hasStick);
 			var fireCount = 1;
 
 			//draw fireplace
@@ -223,11 +221,9 @@ body{
 
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(880,0,120,350,6,events);
-				createEventBox(880,0,120,350,6,events);
-				createEventBox(0,400,100,200,5,events);
 				createEventBox(400,380,220,120,2,events);
 				createEventBox(100,400,100,100,5,events);
-                createEventBox(375, 20, 80, 80, 1, events);
+                createEventBox(375, 20, 80, 80, 11, events);
 			});
 
         }
@@ -235,7 +231,7 @@ body{
 
 			events.setStage(function () {
 				this.clear();
-				events.context.drawImage(images["hallway"], 0, 0, events.canvas.width-200, events.canvas.height);
+				events.context.drawImage(images["hallway"], 0, 0, events.canvas.width, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(0,450,430,250,1,events);
 				createEventBox(670,40,200,550,7,events);
@@ -356,10 +352,6 @@ body{
 							if((puzy[i]  > puzy[i+1]-pixlet) && ( puzy[i] < puzy[i+1]+pixlet)){
 								check++;
 								console.log("piece: "+ i);
-								if(piecegrabbed == 0){
-									puzx[i] = puzx[i+1]-piecewidth;
-									puzy[i] = puzy[i+1]; 
-								}
 							}							
 						}						
 					}					
@@ -372,9 +364,6 @@ body{
 				else{
 					check = 0;
 				}
-				
-				
-				
 			
 				this.clear();
 				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);				
@@ -386,7 +375,6 @@ body{
 					context.rect(puzx[i], puzy[i], piecewidth,piecewidth);
 					this.addRegionEventListener("mousedown", function(){
 						draggingRect[i] = true;
-						piecegrabbed = i;
 						var mousePos = events.getMousePos();
 						draggingRectOffsetX[i] = mousePos.x - puzx[i];
 						draggingRectOffsetY[i] = mousePos.y - puzy[i];
