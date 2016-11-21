@@ -131,10 +131,10 @@ Events.prototype.closeRegion = function(){
         else if (!this.mouseMove && this.currentRegion.onmousemove !== undefined) {
             this.currentRegion.onmousemove();
             this.mouseMove = true;
-        }
-        // handle mouseout condition
-        if (this.currentRegion.onmouseout !== undefined) {
+        }        
+    }
+	// handle mouseout condition
+        else if (this.currentRegion.onmouseout !== undefined) {
             this.currentRegion.onmouseout();
         }
-    }
 };
