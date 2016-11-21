@@ -29,6 +29,7 @@ body{
     ><canvas id = "canvasOne" width = "1000" height = "700"></canvas>
 </div>
 <script type="text/javascript" src="Events.js"></script>
+<script type="text/javascript" src ="Animation.js"></script>
 <script type="text/javascript">
 
     /**TODO:
@@ -60,6 +61,8 @@ body{
 	var images = {};
 	var hasBedroomKey = false; // until they get it from the portrait
     var hasWeapon = false; // until they get the fire poker
+    var hasStick = false; // until they get the stick from the lampshade
+    var lampOn = false;
 
 	// Returns a random integer between min (included) and max (included)
 	// Using Math.round() will give you a non-uniform distribution!
@@ -107,6 +110,8 @@ body{
 		loadImage("fire2");
 		loadImage("fire3");
 		loadImage("xylophone");
+        loadImage("lamplightingafter");
+        loadImage("lampwithoutstick");
 
 		//check if images are loaded on interval of 1 ms
 		var checkloaded = setInterval(function(){
@@ -170,7 +175,14 @@ body{
 					clearInterval(fireplace); //end loop
 				}
 				events.clear();
-				events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+
+                if (lampOn == false) {
+                    events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+                } else if (lampOn == true && hasStick == false) {
+                    events.context.drawImage(images["lamplightingafter"], 0, 0, events.canvas.width, events.canvas.height);
+                } else if (lampOn == true && hasStick == true) {
+                    events.context.drawImage(images["lampwithoutstick"], 0, 0, events.canvas.width, events.canvas.height);
+                }
 				if(hasWeapon){}
 
 
@@ -179,8 +191,6 @@ body{
 				if(fireCount==4){
 					fireCount=1;
 				}
-
-
 
 			},100);
 
@@ -194,7 +204,8 @@ body{
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(880,0,120,350,6,events);
 				createEventBox(880,0,120,350,6,events);
-				createEventBox(500,0,100,100,5,events);
+				createEventBox(100,400,100,100,5,events);
+                createEventBox(375, 20, 80, 80, 1, events);
 			});
 
         }
@@ -227,30 +238,31 @@ body{
 			});
 
             var canvas = document.getElementById("canvasOne");
-            var canvasPos = getPosition(canvas);
+            var canvasPos = getCanvasPosition(canvas);
             var cursorX = 0;
             var cursorY = 0;
 
             canvas.addEventListener("mousemove", setCursor, false);
+            canvas.addEventListener("click", clickNote, false);
             drawStick();
 
-            function getPosition(element) {
-                var xPosition = 0;
-                var yPosition = 0;
+
+            function getCanvasPosition(element) {
+                var x = 0;
+                var y = 0;
 
                 while (element) {
-                    xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-                    yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+                    x += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+                    y += (element.offsetTop - element.scrollTop + element.clientTop);
                     element = element.offsetParent;
                 }
                 return {
-                    x: xPosition,
-                    y: yPosition
+                    x: x,
+                    y: y
                 };
             }
 
             function setCursor(event) {
-                console.log("moved!!");
                 cursorX = event.clientX - canvasPos.x;
                 cursorY = event.clientY - canvasPos.y;
             }
@@ -260,16 +272,27 @@ body{
                 events.context.arc(cursorX, cursorY, 30, 0, 2 * Math.PI, true);
                 events.context.fillStyle = "#FF6A6A";
                 events.context.strokeStyle = "#FF6A6A";
-                events.context.lineWidth = 5;
+                events.context.lineWidth = 7;
                 events.context.closePath();
                 events.context.fill();
 
                 events.context.beginPath();
                 events.context.moveTo(cursorX + 15, cursorY + 15);
-                events.context.lineTo(cursorX + 120, cursorY + 120);
+                events.context.lineTo(cursorX + 130, cursorY + 130);
                 events.context.stroke();
                 requestAnimationFrame(drawStick);
             }
+
+            function clickNote(event) {
+                console.log("click!");
+                var clickX = event.clientX - canvasPos.x;
+                var clickY = event.clientY - canvasPos.y;
+
+                console.log(clickX, clickY);
+
+                
+            }
+
         }
     }
 
