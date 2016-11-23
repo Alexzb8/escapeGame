@@ -28,6 +28,42 @@ body{
 	<canvas id = "canvasTwo" width = "200" height = "700"></canvas
     ><canvas id = "canvasOne" width = "1000" height = "700"></canvas>
 </div>
+
+<audio id="aNote">
+    <source src="./audio/aNote.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="bNote">
+    <source src="./audio/bNote.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="cNote">
+    <source src="./audio/cNote.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="dNote">
+    <source src="./audio/dNote.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="eNote">
+    <source src="./audio/eNote.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="fNote">
+    <source src="./audio/fNote.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="gNote">
+    <source src="./audio/gNote.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
 <script type="text/javascript" src="Events.js"></script>
 <script type="text/javascript" src ="Animation.js"></script>
 <script type="text/javascript">
@@ -64,6 +100,9 @@ body{
     var hasWeapon = false; // until they get the fire poker
     var hasStick = false; // until they get the stick from the lampshade
     var lampOn = false;
+
+    // xylophone notes
+    var noteRow = [];
 
 	// Returns a random integer between min (included) and max (included)
 	// Using Math.round() will give you a non-uniform distribution!
@@ -125,6 +164,23 @@ body{
 				continueGame(events);
 			}
 		},1);
+
+        // fill in each note of the close-up xylophone
+        noteRow[0] = new Note("cNote", 17, 334, 175,
+            688, context);
+        noteRow[1] = new Note("dNote", 184, 359, 332,
+            683, context);
+        noteRow[2] = new Note("eNote", 336, 371, 472,
+            673, context);
+        noteRow[3] = new Note("fNote", 473, 381, 607,
+            673, context);
+        noteRow[4] = new Note("gNote", 615, 390, 742,
+            673, context);
+        noteRow[5] = new Note("aNote", 746, 397, 868,
+            665, context);
+        noteRow[6] = new Note("bNote", 873, 405, 989,
+            665, context);
+
     }
     function changeScreen(screen,events){
 		//clone canvas to get rid of previous events
@@ -156,7 +212,7 @@ body{
 			}
 			else {
 			changeScreen(screen,events);
-			}			
+			}
 		});
 		events.addRegionEventListener("mouseout", function () {
 			document.body.style.cursor = "default";
@@ -171,6 +227,59 @@ body{
 	function checkregion(mouse){
 
 	}
+
+    // defining each note on the xylophone
+    function Note(note, topLeftX, topLeftY, topRightX,
+                   bottomLeftY, context) {
+        this.ctx = context
+
+        this.note = note;
+
+        //x and y coordinates of the outline of the key
+        this.topLeftX = topLeftX;
+        this.topLeftY = topLeftY;
+        this.topRightX = topRightX;
+        this.bottomLeftY = bottomLeftY;
+
+        this.width = topRightX - topLeftX;
+        this.height = bottomLeftY - topLeftY;
+    }
+
+    Note.prototype.playSelf = function() {
+
+        var sound = document.getElementById(this.note);
+        sound.play();
+
+        this.fadeOut();
+    };
+
+    Note.prototype.fadeOut = function() {
+        var ctx = this.ctx;
+        var alpha = 1.0,   // full opacity
+            interval = setInterval(function () {
+//            canvas.width = canvas.width; // Clears the canvas
+                ctx.save();
+                console.log("coloring");
+                ctx.fillStyle = "rgba(255, 0, 0, " + alpha + ")";
+                ctx.fillRect(this.topLeftX, this.topLeftY, this.width, this.height);
+                ctx.restore();
+
+                alpha = alpha - 0.05; // decrease opacity (fade out)
+                if (alpha < 0) {
+                    clearInterval(interval);
+                }
+            }, 50);
+    }
+
+    Note.prototype.keyDidPlay = function(stickX, stickY) {
+        if (stickX >= this.topLeftX && stickX <= this.topRightX
+            && stickY >= this.topLeftY && stickY <= this.bottomLeftY) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
 	function continueGame(events) {
 
 		events = new Events("canvasOne");
@@ -306,16 +415,18 @@ body{
                 var clickX = event.clientX - canvasPos.x;
                 var clickY = event.clientY - canvasPos.y;
 
-                console.log(clickX, clickY);
-
-                
+                for (var i = 0; i < 7; i++) {
+                    if (noteRow[i].keyDidPlay(clickX, clickY)) {
+                        noteRow[i].playSelf();
+                    }
+                }
             }
-
         }
+
 		else if (currentScreen == 2) {
 			//puzzle
 			var draggingRect = [false,false,false,false,false,false,false,false,false];
-			var check = 0;			
+			var check = 0;
 			var draggingRectOffsetX = [0,0,0,0,0,0,0,0,0];
 			var draggingRectOffsetY = [0,0,0,0,0,0,0,0,0];
 			var puzx = [100, 300, 500,100, 300, 500,100, 300, 500];
@@ -330,19 +441,19 @@ body{
 					if (draggingRect[i]) {
 						puzx[i] = mousePos.x - draggingRectOffsetX[i];
 						puzy[i] = mousePos.y - draggingRectOffsetY[i];
-					}				
+					}
 				}
-				
+
 				//now check if they are correctly organized;
 				for(i=0;i<9;i++){
 					if(i==2||i==5){
 						if((puzx[i]-(piecewidth*2)>puzx[i+1]-pixlet)&&(puzx[i]-(piecewidth*2)<puzx[i+1]+pixlet)){
-						
+
 							if((puzy[i] + piecewidth > puzy[i+1]-pixlet)&&(puzy[i] + piecewidth < puzy[i+1]+pixlet)){
 								check++;
 								console.log("piece: "+ i);
 							}
-						}				
+						}
 					}
 					else if (i==8){
 						check++;
@@ -352,10 +463,10 @@ body{
 							if((puzy[i]  > puzy[i+1]-pixlet) && ( puzy[i] < puzy[i+1]+pixlet)){
 								check++;
 								console.log("piece: "+ i);
-							}							
-						}						
-					}					
-				}				
+							}
+						}
+					}
+				}
 				//check if all of the pieces are correct
 				if(check == 9){
 					console.log("pieces are organized");
@@ -364,12 +475,12 @@ body{
 				else{
 					check = 0;
 				}
-			
+
 				this.clear();
-				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);				
+				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
-				
-				for(i=0;i<9;i++){		
+
+				for(i=0;i<9;i++){
 
 					this.beginRegion();
 					context.rect(puzx[i], puzy[i], piecewidth,piecewidth);
@@ -391,12 +502,12 @@ body{
 						console.log("mouseover");
 					});
 					this.closeRegion();
-				
+
 					events.context.drawImage(images[i], puzx[i], puzy[i], 100, 100);
-					
+
 				}
-						
-				
+
+
 			});
 
         }
