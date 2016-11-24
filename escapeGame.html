@@ -56,7 +56,7 @@ body{
      */
     var currentScreen = 0;
     var timer = 0;
-	var totalResources = 23;
+	var totalResources = 25;
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
 	var images = {};
@@ -64,6 +64,8 @@ body{
     var hasWeapon = false; // until they get the fire poker
     var hasStick = false; // until they get the stick from the lampshade
     var lampOn = false;
+	var puzx = [690, 228, 776, 415, 444, 622, 216, 59, 475 ];
+	var puzy = [380, 132, 217,  90, 259,  91, 391,254, 440 ];
 
 	// Returns a random integer between min (included) and max (included)
 	// Using Math.round() will give you a non-uniform distribution!
@@ -139,6 +141,7 @@ body{
 		continueGame(events);
 	}
 	function createEventBox(x,y,width,height,screen,events){
+		//try setting stage here
 		events.beginRegion();
 		events.context.beginPath();
 		events.context.rect(x, y, width, height);
@@ -167,6 +170,46 @@ body{
 			//console.log("mouseover");
 		});
 		events.closeRegion();
+	}
+	function createEventShape(x,y,x1,y1,x2,y2,x3,y3,screen,events){
+		//try setting stage here
+		
+		events.context.save();
+		events.beginRegion();
+		events.context.beginPath();
+		events.context.lineWidth = 4;
+		events.context.strokeStyle = "black";
+		events.context.fillStyle = "#00D2FF";
+		events.context.moveTo(x,y);
+		events.context.lineTo(x1,y1);
+		events.context.lineTo(x2,y2);
+		events.context.lineTo(x3,y3);
+		events.context.closePath();		
+		events.context.fill();
+		events.context.stroke();
+		events.addRegionEventListener("mousedown",function(){
+			if (screen==11){
+				console.log("click on lamp");
+				lampOn = !lampOn;
+				changeScreen(1,events);
+			}
+			else {
+			changeScreen(screen,events);
+			}			
+		});
+		events.addRegionEventListener("mouseout", function () {
+			document.body.style.cursor = "default";
+			//console.log("mouseout");
+		});
+		events.addRegionEventListener("mouseover", function () {
+			document.body.style.cursor = "pointer";
+			//console.log("mouseover");
+			console.log("inside event shape");
+		});
+		events.closeRegion();
+		
+		
+		events.context.restore();
 	}
 	function checkregion(mouse){
 
@@ -220,10 +263,10 @@ body{
 				//events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
 
 				createEventBox(0,0,100,50,0,events);
-				createEventBox(880,0,120,350,6,events);
+				createEventShape(880,0,1000,0,1000,360,880,260,6,events);
 				createEventBox(400,380,220,120,2,events);
-				createEventBox(100,400,100,100,5,events);
-                createEventBox(375, 20, 80, 80, 11, events);
+				createEventShape(7,520,229,385,265,416,77,590,5,events);
+				createEventShape(400,24,430,24,448,90,387,90,11,events);
 			});
 
         }
@@ -318,8 +361,6 @@ body{
 			var check = 0;			
 			var draggingRectOffsetX = [0,0,0,0,0,0,0,0,0];
 			var draggingRectOffsetY = [0,0,0,0,0,0,0,0,0];
-			var puzx = [100, 300, 500,100, 300, 500,100, 300, 500];
-			var puzy = [100, 100, 100,300,300,300,500,500,500];
 			var piecewidth = 100;
 			var context = events.context;
 			var pixlet = 10;//how many pixels we can be not correctly placed
@@ -330,7 +371,8 @@ body{
 					if (draggingRect[i]) {
 						puzx[i] = mousePos.x - draggingRectOffsetX[i];
 						puzy[i] = mousePos.y - draggingRectOffsetY[i];
-					}				
+						
+					}					
 				}
 				
 				//now check if they are correctly organized;
@@ -358,18 +400,18 @@ body{
 				}				
 				//check if all of the pieces are correct
 				if(check == 9){
-					console.log("pieces are organized");
 					check = 0;
+					console.log("pieces are organized");
 				}
 				else{
 					check = 0;
 				}
 			
 				this.clear();
-				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);				
+				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
 				
-				for(i=0;i<9;i++){		
+				for(i=0;i<9;i++){
 
 					this.beginRegion();
 					context.rect(puzx[i], puzy[i], piecewidth,piecewidth);
@@ -384,7 +426,7 @@ body{
 					});
 					this.addRegionEventListener("mouseout", function () {
 						document.body.style.cursor = "default";
-						console.log("mouseout");
+						//console.log("mouseout");
 					});
 					this.addRegionEventListener("mouseover", function () {
 						document.body.style.cursor = "pointer";
