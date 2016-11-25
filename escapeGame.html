@@ -56,9 +56,9 @@ body{
      * 10: death by timer screen
 	   11: LAMP TOGGLE
      */
-    var currentScreen = 0;
+    var currentScreen = 1;
     var timer = 0;
-	var totalResources = 25;
+	var totalResources = 30;
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
 	var images = {};
@@ -98,13 +98,7 @@ body{
 		}
 	}
 	console.log(xylophoneAnswer);
-	console.log(noteString);
-	
-	  
-	
-	
-	
-	
+	console.log(noteString);	
 	
 
 	// Returns a random integer between min (included) and max (included)
@@ -178,8 +172,14 @@ body{
 		loadImage("fire1");
 		loadImage("fire2");
 		loadImage("fire3");
+		loadImage("fire3dark");
+		loadImage("fire2dark");
+		loadImage("fire1dark");
 		loadImage("xylophone");
 		loadImage("table");
+		loadImage("puzzleboxwpieces");
+		loadImage("puzzleboxwpiecesdark");
+		
 		for(i=0;i<9;i++){
 			loadImage(i);
 		}
@@ -365,7 +365,8 @@ body{
 				events.clear();
 				
                 events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
-                
+                events.context.drawImage(images["puzzleboxwpieces"], 440, 370, 120, 120);
+				
 				if(hasWeapon){}
 
 
@@ -614,11 +615,12 @@ body{
 				else{
 					events.context.drawImage(images["lamplightingafter"], 0, 0, events.canvas.width, events.canvas.height);
 				}
+				events.context.drawImage(images["puzzleboxwpiecesdark"], 440, 370, 120, 120);
                     
 				if(hasWeapon){}
 
 
-				events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
+				events.context.drawImage(images["fire"+fireCount+"dark" ], 170, 170, 200, 200);
 				fireCount++;
 				if(fireCount==4){
 					fireCount=1;
