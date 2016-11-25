@@ -74,6 +74,9 @@ body{
     var cursorY = 0;
 	var currentnote = null;
 	var alpha = 1.0;
+	//define global loop for later use
+	var intervalLoop;
+	
 
     // xylophone notes
     var noteRow = [];
@@ -110,7 +113,7 @@ body{
 	  max = Math.floor(max);
 	  return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
-	function newNote(note,events,inter){
+	function newNote(note,events){
 		//input new note into array and check if all notes are equal
 		
 		var equal = 0;
@@ -122,17 +125,20 @@ body{
 		}
 		
 		inputNotes[i] = note;
-		if(inputNotes[i]==xylophoneAnswer[i]){equal++;}
-		
-		if(equal==6){
-			//puzzle is solved			
-			solvedXylo = true;
-			//clear intervals
-			if(inter){
-				clearTimeout(inter);
-			}			
-			changeScreen(1,events);
+		if(inputNotes[i]==xylophoneAnswer[i]){
+			
+			equal++;
+			if(equal==6){
+				//puzzle is solved			
+				solvedXylo = true;
+				//clear interval
+				clearTimeout(intervalLoop);
+				changeScreen(1,events);
+			}
+			
 		}
+		
+		
 	
 	}
 	function loadImage(name) {
@@ -218,7 +224,7 @@ body{
 		currentScreen = screen;
 		continueGame(events);
 	}
-	function createEventBox(x,y,width,height,screen,events,inter){
+	function createEventBox(x,y,width,height,screen,events){
 		//try setting stage here
 		events.beginRegion();
 		events.context.beginPath();
@@ -230,10 +236,8 @@ body{
 		events.context.stroke();
 		events.context.closePath();
 		events.addRegionEventListener("mouseup",function(){
-			//clear intervals
-			if(inter){
-				clearTimeout(inter);
-			}
+			//clear interval
+			clearTimeout(intervalLoop);
 			changeScreen(screen,events);
 			
 		});
@@ -247,7 +251,7 @@ body{
 		});
 		events.closeRegion();
 	}
-	function createEventShape(x,y,x1,y1,x2,y2,x3,y3,screen,events,inter){
+	function createEventShape(x,y,x1,y1,x2,y2,x3,y3,screen,events){
 		//try setting stage here
 		
 		events.context.save();
@@ -264,10 +268,8 @@ body{
 		events.context.fill();
 		events.context.stroke();
 		events.addRegionEventListener("mouseup",function(){
-			//clear intervals
-			if(inter){
-				clearTimeout(inter);
-			}
+			//clear interval
+				clearTimeout(intervalLoop);
 			changeScreen(screen,events);
 			
 		});
@@ -308,7 +310,7 @@ body{
 
         this.note = note;
 		this.noteNum = num;
-		this.noteAudio = AudioFX('audio/'+note,   { formats: ['mp3'], pool: 10 });
+		this.noteAudio = AudioFX('audio/'+note,   { formats: ['wav'], pool: 10 });
 
         //x and y coordinates of the outline of the key
         this.topLeftX = topLeftX;
@@ -329,15 +331,11 @@ body{
 			ctx.restore();		
 		};
     }
-
-    Note.prototype.playSelf = function(events,inter) {
+    Note.prototype.playSelf = function(events) {
 		this.noteAudio.play();
 		//update and check note input array
-      	newNote(this.noteNum,events,inter);        
+      	newNote(this.noteNum,events);        
     };
-
-
-
     Note.prototype.keyDidPlay = function(stickX, stickY) {
         if (stickX >= this.topLeftX && stickX <= this.topRightX
             && stickY >= this.topLeftY && stickY <= this.bottomLeftY) {
@@ -379,20 +377,20 @@ body{
 			}
 			
 			livingLoop();
-			var living1 = setInterval(livingLoop,100); 
+			intervalLoop = setInterval(livingLoop,100); 
 
 
 
 			events.setStage(function () {
 
-				createEventBox(0,0,100,50,0,events,living1);
-				createEventShape(880,0,1000,0,1000,360,880,260,6,events,living1);
+				createEventBox(0,0,100,50,0,events);
+				createEventShape(880,0,1000,0,1000,360,880,260,6,events);
 				if(!solvedXylo){
-					createEventShape(7,520,229,385,265,416,77,590,5,events,living1);
+					createEventShape(7,520,229,385,265,416,77,590,5,events);
 				}
-				createEventShape(400,24,430,24,448,90,387,90,11,events,living1);
+				createEventShape(400,24,430,24,448,90,387,90,11,events);
 				if(!puzzleComplete){
-					createEventBox(400,380,220,120,2,events,living1);
+					createEventBox(400,380,220,120,2,events);
 				}
 				
 			});
@@ -466,7 +464,7 @@ body{
 			
 			xyloLoop();
 			
-			var xLoop = setInterval(xyloLoop,10); 
+			intervalLoop = setInterval(xyloLoop,10); 
 			
 
             canvas.addEventListener("mousemove", function(){
@@ -479,11 +477,12 @@ body{
 
                 for (var i = 0; i < 7; i++) {
                     if (noteRow[i].keyDidPlay(cursorX, cursorY)) {
-                        noteRow[i].playSelf(events,xLoop);
+                        noteRow[i].playSelf(events);
 						currentnote = i;
                     }
                 }
 			}, false);
+			
             
 
 
@@ -628,20 +627,20 @@ body{
 			
 			living2Loop();
 			
-			var living2 = setInterval(living2Loop,100); 
+			intervalLoop = setInterval(living2Loop,100); 
 
 
 
 			events.setStage(function () {
 
-				createEventBox(0,0,100,50,0,events,living2);
-				createEventShape(880,0,1000,0,1000,360,880,260,6,events,living2);
+				createEventBox(0,0,100,50,0,events);
+				createEventShape(880,0,1000,0,1000,360,880,260,6,events);
 				if(!solvedXylo){
-					createEventShape(7,520,229,385,265,416,77,590,5,events,living2);
+					createEventShape(7,520,229,385,265,416,77,590,5,events);
 				}
-				createEventShape(400,24,430,24,448,90,387,90,1,events,living2);
+				createEventShape(400,24,430,24,448,90,387,90,1,events);
 				if(!puzzleComplete){
-					createEventBox(400,380,220,120,2,events,living2);
+					createEventBox(400,380,220,120,2,events);
 				}
 				
 			});
