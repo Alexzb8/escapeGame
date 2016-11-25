@@ -97,11 +97,6 @@ body{
 	console.log(xylophoneAnswer);
 	console.log(noteString);
 	
-	//xylophone audio
-	var notesAudio = [];
-	for(i=0;i<noteLetters.length;i++){
-		notesAudio[i] = AudioFX('audio/'+noteLetters[i]+'Note',   { formats: ['mp3'], pool: 10 });
-	}
 	  
 	
 	
@@ -313,6 +308,7 @@ body{
 
         this.note = note;
 		this.noteNum = num;
+		this.noteAudio = AudioFX('audio/'+note,   { formats: ['mp3'], pool: 10 });
 
         //x and y coordinates of the outline of the key
         this.topLeftX = topLeftX;
@@ -335,8 +331,7 @@ body{
     }
 
     Note.prototype.playSelf = function(events,inter) {
-		//sound.play();
-		notesAudio[this.noteNum].play();
+		this.noteAudio.play();
 		//update and check note input array
       	newNote(this.noteNum,events,inter);        
     };
