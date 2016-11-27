@@ -56,6 +56,7 @@ body{
      * 10: death by timer screen
 	   11: LAMP TOGGLE
         12: drawer opening screen
+     13: bedroom door opening screen
      */
     var currentScreen = 1;
     var timer = 0;
@@ -63,8 +64,8 @@ body{
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
 	var images = {};
-	var hasBedroomKey = false; // until they get it from the portrait
-    var hasWeapon = false; // until they get the fire poker
+	var hasBedroomKey = true; // until they get it from the portrait
+    var hasWeapon = true; // until they get the fire poker
     var hasStick = false; // until they get the stick from the lampshade
     var lampOn = false;
 	var puzzleComplete = false;
@@ -75,10 +76,12 @@ body{
     var cursorY = 0;
 	var currentnote = null;
 	var alpha = 1.0;
-    var hasDrawerKey = true;
+    var hasDrawerKey = true; // until they get it from the puzzle
     var drawerOpened = false;
 	//define global loop for later use
 	var intervalLoop;
+
+    var bedroomOpen = false;
 
 
     // xylophone notes
@@ -167,7 +170,6 @@ body{
 		loadImage("SCREENGAMEOVER");
 		loadImage("SCREENMONSTER");
 		loadImage("SCREENWIN");
-		loadImage("opendoor");
 		loadImage("monster");
 		loadImage("livingroom");
 		loadImage("hallway");
@@ -185,6 +187,9 @@ body{
         loadImage("drawerhalfopened");
         loadImage("drawerclosed");
         loadImage("draweropened");
+        loadImage("deathdoorangled");
+        loadImage("deathdoorangled2");
+        loadImage("deathdoorangledwithmonster");
 
 		for(i=0;i<9;i++){
 			loadImage(i);
@@ -355,7 +360,7 @@ body{
 
 		events = new Events("canvasOne");
 
-        if      (currentScreen == 0) {
+        if (currentScreen == 0) {
 			events.setStage(function () {
 				this.clear();
 				events.context.drawImage(images["SCREEN1"], 0, 0, events.canvas.width, events.canvas.height);
@@ -411,18 +416,32 @@ body{
 				events.context.drawImage(images["hallway"], 0, 0, events.canvas.width, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
 				createEventBox(0,450,430,250,1,events);
-				createEventBox(670,40,200,550,7,events);
+                createEventBox(670,40,200,550,7,events);
 			});
 
         }
 		else if (currentScreen == 7) {
 
-			events.setStage(function () {
-				this.clear();
-				events.context.drawImage(images["closeddoor"], 0, 0, events.canvas.width, events.canvas.height);
-				createEventBox(0,0,100,50,0,events);
-				createEventBox(0,550,1000,150,6,events);
-			});
+			if (bedroomOpen == false ) {
+			    events.setStage(function () {
+                    this.clear();
+                    events.context.drawImage(images["closeddoor"], 0, 0, events.canvas.width, events.canvas.height);
+                    createEventBox(0,0,100,50,0,events);
+                    createEventBox(0,550,1000,150,6,events);
+
+                    // to open the door
+                    if (hasBedroomKey == true) {
+                        createEventBox(345, 10, 310, 530, 13, events);
+                    }
+                });
+            } else {
+                events.setStage(function () {
+                    this.clear();
+                    events.context.drawImage(images["deathdoorangled2"], 0, 0, events.canvas.width, events.canvas.height);
+                    createEventBox(0,0,100,50,0,events);
+                    createEventBox(0,550,1000,150,6,events);
+                });
+            }
 
         }
 
@@ -633,7 +652,16 @@ body{
 			});
 
         }
-		else if (currentScreen == 11){
+        else if (currentScreen == 9) {
+            // GAME OVER BY MONSTER
+            events.setStage(function () {
+                this.clear();
+                events.context.drawImage(images["SCREENMONSTER"], 0, 0, events.canvas.width, events.canvas.height);
+                // TODO: RESET GAME
+            });
+        }
+
+		else if (currentScreen == 11) {
 			var fireCount = 1;
 			var fireplace = null;
 
@@ -705,29 +733,56 @@ body{
             drawerOpened = true;
 
         }
-	}
+        else if (currentScreen == 13) {
+            events.setStage(function () {
+                createEventBox(0,0,100,50,0,events); // EXIT BUTTONS
+                createEventBox(0,550,1000,150,6,events);
+            });
+
+            bedroomOpen = true;
+
+            var canvas = document.getElementById("canvasOne");
+            events.clear();
+
+            // if has weapon
+            if (hasWeapon == true) {
+                events.context.drawImage(images["deathdoorangled"], 0, 0, events.canvas.width, events.canvas.height);
+                setTimeout(function(){
+                    events.clear();
+                    events.context.drawImage(images["deathdoorangledwithmonster"], 0, 0, events.canvas.width, events.canvas.height);
+
+                    // TODO PLAY AUDIO OF MONSTER DYING
+
+                    setTimeout(function(){
+                        events.clear();
+                        events.context.drawImage(images["deathdoorangled2"], 0, 0, events.canvas.width, events.canvas.height);
+                    }, 400);
+
+                }, 400);
 
 
-    // if they click on the bedroom door AFTER they are at the close up view (not if they are just inside the hallway still)
-    function attemptUnlockUpCloseBedroomDoor(canvas,context) {
-        if (hasBedroomKey && hasWeapon) {
-                context.drawImage(images["opendoor"], 0, 0, canvas.width, canvas.height);
+            } else {
 
-            // then play the video of beating the monster and getting the key
-        } else if (hasBedroomKey && ! hasWeapon) {
-            context.drawImage(images["monster"], 0, 0, canvas.width, canvas.height);
+                events.context.drawImage(images["deathdoorangled"], 0, 0, events.canvas.width, events.canvas.height);
+                setTimeout(function(){
+                    events.clear();
+                    events.context.drawImage(images["deathdoorangledwithmonster"], 0, 0, events.canvas.width, events.canvas.height);
 
-            // then play the video of getting killed by the monster
+                    // TODO PLAY AUDIO OF MONSTER DYING
 
-            // then take user to end screen
-			context.drawImage(images["SCREENMONSTER"], 0, 0, canvas.width, canvas.height);
+                    setTimeout(function(){
+                        changeScreen(9,events);
+                    }, 400);
+                }, 400);
+            }
 
 
-        } else {
-            // play some kind of "locked door" sound, display text of "door is locked"
+
+            // TODO: if does not have weapon, play audio and die
+
+
         }
-    }
-
+	}
 
     window.onload = function() {
 		var events = new Events("canvasOne");
