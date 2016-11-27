@@ -65,7 +65,7 @@ body{
 	var finishedLoading = false;
 	var images = {};
 	var hasBedroomKey = true; // until they get it from the portrait
-    var hasWeapon = true; // until they get the fire poker
+    var hasWeapon = false; // until they get the fire poker
     var hasStick = false; // until they get the stick from the lampshade
     var lampOn = false;
 	var puzzleComplete = false;
@@ -190,6 +190,7 @@ body{
         loadImage("deathdoorangled");
         loadImage("deathdoorangled2");
         loadImage("deathdoorangledwithmonster");
+        loadImage("poker");
 
 		for(i=0;i<9;i++){
 			loadImage(i);
@@ -378,7 +379,9 @@ body{
                 events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
                 events.context.drawImage(images["puzzleboxwpieces"], 440, 370, 120, 120);
 
-				if(hasWeapon){}
+                if(hasWeapon == false){
+                    events.context.drawImage(images["poker"], 355, 150, 70, 100);
+                }
 
 
 				events.context.drawImage(images["fire"+fireCount ], 170, 170, 200, 200);
@@ -679,7 +682,9 @@ body{
 				}
 				events.context.drawImage(images["puzzleboxwpiecesdark"], 440, 370, 120, 120);
 
-				if(hasWeapon){}
+                if(hasWeapon == false){
+                    events.context.drawImage(images["poker"], 355, 150, 70, 100);
+                }
 
 
 				events.context.drawImage(images["fire"+fireCount+"dark" ], 170, 170, 200, 200);
