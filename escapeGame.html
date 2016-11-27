@@ -55,6 +55,7 @@ body{
      * 9: death by monster screen
      * 10: death by timer screen
 	   11: LAMP TOGGLE
+        12: drawer opening screen
      */
     var currentScreen = 1;
     var timer = 0;
@@ -74,22 +75,24 @@ body{
     var cursorY = 0;
 	var currentnote = null;
 	var alpha = 1.0;
+    var hasDrawerKey = true;
+    var drawerOpened = false;
 	//define global loop for later use
 	var intervalLoop;
-	
+
 
     // xylophone notes
     var noteRow = [];
-	
+
 	//create xylophone puzzle notes
 	var noteLetters = ["C","D","E","F","G","A","B"];
 	var xylophoneAnswer = [];
 	var numNotes = 6;            //number of notes user has to input
 	var inputNotes = [numNotes];
-	var noteString = "";	
+	var noteString = "";
 	for(i = 0 ; i<numNotes;i++){
 		xylophoneAnswer[i] = random(0,6);
-		
+
 		if(i==0){
 			noteString = noteString +  noteLetters[xylophoneAnswer[i]];
 		}
@@ -98,8 +101,8 @@ body{
 		}
 	}
 	console.log(xylophoneAnswer);
-	console.log(noteString);	
-	
+	console.log(noteString);
+
 
 	// Returns a random integer between min (included) and max (included)
 	function random(min, max) {
@@ -109,31 +112,31 @@ body{
 	}
 	function newNote(note,events){
 		//input new note into array and check if all notes are equal
-		
+
 		var equal = 0;
 		var i = 0;
-	
+
 		for(i=0;i<numNotes-1;i++){
 			inputNotes[i] = inputNotes[i+1];
 			if(inputNotes[i]==xylophoneAnswer[i]){equal++;}
 		}
-		
+
 		inputNotes[i] = note;
 		if(inputNotes[i]==xylophoneAnswer[i]){
-			
+
 			equal++;
 			if(equal==6){
-				//puzzle is solved			
+				//puzzle is solved
 				solvedXylo = true;
 				//clear interval
 				clearTimeout(intervalLoop);
 				changeScreen(1,events);
 			}
-			
+
 		}
-		
-		
-	
+
+
+
 	}
 	function loadImage(name) {
 		//add image to images array and check if loaded
@@ -179,7 +182,10 @@ body{
 		loadImage("table");
 		loadImage("puzzleboxwpieces");
 		loadImage("puzzleboxwpiecesdark");
-		
+        loadImage("drawerhalfopened");
+        loadImage("drawerclosed");
+        loadImage("draweropened");
+
 		for(i=0;i<9;i++){
 			loadImage(i);
 		}
@@ -209,8 +215,8 @@ body{
             665, context);
         noteRow[6] = new Note(6,"bNote", 873, 405, 989,
             665, context);
-			
-		
+
+
 
     }
     function changeScreen(screen,events){
@@ -239,7 +245,7 @@ body{
 			//clear interval
 			clearTimeout(intervalLoop);
 			changeScreen(screen,events);
-			
+
 		});
 		events.addRegionEventListener("mouseout", function () {
 			document.body.style.cursor = "default";
@@ -253,7 +259,7 @@ body{
 	}
 	function createEventShape(x,y,x1,y1,x2,y2,x3,y3,screen,events){
 		//try setting stage here
-		
+
 		events.context.save();
 		events.beginRegion();
 		events.context.beginPath();
@@ -264,14 +270,14 @@ body{
 		events.context.lineTo(x1,y1);
 		events.context.lineTo(x2,y2);
 		events.context.lineTo(x3,y3);
-		events.context.closePath();		
+		events.context.closePath();
 		events.context.fill();
 		events.context.stroke();
 		events.addRegionEventListener("mouseup",function(){
 			//clear interval
 				clearTimeout(intervalLoop);
 			changeScreen(screen,events);
-			
+
 		});
 		events.addRegionEventListener("mouseout", function () {
 			document.body.style.cursor = "default";
@@ -282,8 +288,8 @@ body{
 			//console.log("mouseover");
 		});
 		events.closeRegion();
-		
-		
+
+
 		events.context.restore();
 	}
 	function checkregion(mouse){
@@ -317,7 +323,7 @@ body{
         this.topLeftY = topLeftY;
         this.topRightX = topRightX;
         this.bottomLeftY = bottomLeftY;
-		
+
         this.width = topRightX - topLeftX;
         this.height = bottomLeftY - topLeftY;
 		this.drawBox = function(events){
@@ -327,14 +333,14 @@ body{
 			ctx.rect(this.topLeftX, this.topLeftY, this.width, this.height);
 			ctx.fillStyle = "rgba(255, 0, 0, " + alpha + ")";
 			ctx.fill();
-			ctx.closePath();				
-			ctx.restore();		
+			ctx.closePath();
+			ctx.restore();
 		};
     }
     Note.prototype.playSelf = function(events) {
 		this.noteAudio.play();
 		//update and check note input array
-      	newNote(this.noteNum,events);        
+      	newNote(this.noteNum,events);
     };
     Note.prototype.keyDidPlay = function(stickX, stickY) {
         if (stickX >= this.topLeftX && stickX <= this.topRightX
@@ -359,14 +365,14 @@ body{
 		else if (currentScreen == 1) {
 			var fireCount = 1;
 			var fireplace = null;
-			
-			
+
+
 			function livingLoop(){
 				events.clear();
-				
+
                 events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
                 events.context.drawImage(images["puzzleboxwpieces"], 440, 370, 120, 120);
-				
+
 				if(hasWeapon){}
 
 
@@ -376,9 +382,9 @@ body{
 					fireCount=1;
 				}
 			}
-			
+
 			livingLoop();
-			intervalLoop = setInterval(livingLoop,100); 
+			intervalLoop = setInterval(livingLoop,100);
 
 
 
@@ -393,7 +399,8 @@ body{
 				if(!puzzleComplete){
 					createEventBox(400,380,220,120,2,events);
 				}
-				
+                createEventBox(510, 150, 130, 20, 4, events);
+
 			});
 
         }
@@ -418,43 +425,70 @@ body{
 			});
 
         }
+
+        else if (currentScreen == 4) {
+            if (drawerOpened == false) {
+                events.setStage(function () {
+                    this.clear();
+                    events.context.drawImage(images["drawerclosed"], 0, 0, events.canvas.width, events.canvas.height);
+                    createEventBox(0,0,100,50,1,events); // BACK BUTTON
+
+                    if (hasDrawerKey == true) {
+                        createEventBox(240, 370, 520, 100, 12, events);
+                    }
+                });
+
+            } else {
+                events.setStage(function () {
+                    this.clear();
+                    events.context.drawImage(images["draweropened"], 0, 0, events.canvas.width, events.canvas.height);
+                    events.context.font = "30px Arial";
+                    events.context.fillStyle = "#000000";
+                    events.context.fillText(noteString, 400, 550);
+
+                    createEventBox(0,0,100,50,1,events); // BACK BUTTON
+                });
+            }
+
+        }
+
 		else if (currentScreen == 5) {
-			
+
 
 			var canvas = document.getElementById("canvasOne");
-            var canvasPos = getCanvasPosition(canvas);            
+            var canvasPos = getCanvasPosition(canvas);
 			var mousePos = events.getMousePos();
 			var ongoingnote = null;
 			var done = true;
-			
-		
+
+
 			events.setStage(function () {
-				document.body.style.cursor = "none";	//no cursor			
+				document.body.style.cursor = "none";	//no cursor
 			});
-			
+
 			//loop to draw xylophone
-			
+
 			function xyloLoop(){
 				events.clear();
-				
+
 				events.context.drawImage(images["xylophone"], 0, 0, events.canvas.width, events.canvas.height);
-				
+
 				//check if there is a playing note to draw red box
 				if(currentnote!=null){
-					
+
 					if(done){
 						done = false;
 						ongoingnote = currentnote;
 					}
 					if(currentnote!=ongoingnote){
 						alpha = 1.0;
-						ongoingnote = currentnote;					
+						ongoingnote = currentnote;
 					}
 					//draw red box
 					noteRow[currentnote].drawBox(events);
-					
+
 					//decrease alpha value and check if animation is done
-					alpha = alpha - .04;  
+					alpha = alpha - .04;
 					if(alpha<0){
 						currentnote = null ;
 						alpha = 1.0;
@@ -462,17 +496,17 @@ body{
 				}
 				drawStick(events);
 			}
-			
+
 			xyloLoop();
-			
-			intervalLoop = setInterval(xyloLoop,10); 
-			
+
+			intervalLoop = setInterval(xyloLoop,10);
+
 
             canvas.addEventListener("mousemove", function(){
 				mousePos = events.getMousePos();
                 cursorX = mousePos.x ;
                 cursorY = mousePos.y ;
-				
+
 			}, false);
             canvas.addEventListener("mousedown", function(){
 
@@ -483,8 +517,8 @@ body{
                     }
                 }
 			}, false);
-			
-            
+
+
 
 
             function getCanvasPosition(element) {
@@ -502,9 +536,9 @@ body{
                 };
             }
 
-            
 
-            
+
+
         }
 		else if (currentScreen == 2) {
 			//puzzle
@@ -523,12 +557,12 @@ body{
 						puzx[i] = mousePos.x - draggingRectOffsetX[i];
 						puzy[i] = mousePos.y - draggingRectOffsetY[i];
 
-						
-					}				
+
+					}
 
 				}
 
-				
+
 
 				//now check if they are correctly organized;
 				for(i=0;i<9;i++){
@@ -553,9 +587,9 @@ body{
 				}
 				//check if all of the pieces are correct
 				if(check == 9){
-					check = 0;					
+					check = 0;
 					puzzleComplete = true;
-					
+
 				}
 				else{
 					check = 0;
@@ -565,7 +599,7 @@ body{
 				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);
 				createEventBox(0,0,100,50,0,events);
 
-				
+
 
 				for(i=0;i<9;i++){
 
@@ -602,21 +636,21 @@ body{
 		else if (currentScreen == 11){
 			var fireCount = 1;
 			var fireplace = null;
-			
-			
+
+
 			function living2Loop(){
 				events.clear();
-				
+
 
                 if (hasStick) {
 					events.context.drawImage(images["lampwithoutstick"], 0, 0, events.canvas.width, events.canvas.height);
-					
+
 				}
 				else{
 					events.context.drawImage(images["lamplightingafter"], 0, 0, events.canvas.width, events.canvas.height);
 				}
 				events.context.drawImage(images["puzzleboxwpiecesdark"], 440, 370, 120, 120);
-                    
+
 				if(hasWeapon){}
 
 
@@ -626,10 +660,10 @@ body{
 					fireCount=1;
 				}
 			}
-			
+
 			living2Loop();
-			
-			intervalLoop = setInterval(living2Loop,100); 
+
+			intervalLoop = setInterval(living2Loop,100);
 
 
 
@@ -644,9 +678,33 @@ body{
 				if(!puzzleComplete){
 					createEventBox(400,380,220,120,2,events);
 				}
-				
+
+                createEventBox(510, 150, 130, 20, 4, events);
+
 			});
 		}
+
+		else if (currentScreen == 12) {
+            events.setStage(function () {
+                createEventBox(0,0,100,50,1,events); // BACK BUTTON
+            });
+
+            var canvas = document.getElementById("canvasOne");
+            // draw half open drawer first
+            events.clear();
+            events.context.drawImage(images["drawerhalfopened"], 0, 0, events.canvas.width, events.canvas.height);
+
+            setTimeout(function(){
+                events.clear();
+                events.context.drawImage(images["draweropened"], 0, 0, events.canvas.width, events.canvas.height);
+                events.context.font = "30px Arial";
+                events.context.fillStyle = "#000000";
+                events.context.fillText(noteString, 400, 550);
+            }, 400);
+
+            drawerOpened = true;
+
+        }
 	}
 
 
