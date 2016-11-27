@@ -3,27 +3,34 @@ var Events = function(canvasId){
     this.context = this.canvas.getContext("2d");
     this.stage = undefined;
     this.listening = false;
+
     // desktop flags
     this.mousePos = null;
     this.mouseDown = false;
     this.mouseUp = false;
     this.mouseOver = false;
     this.mouseMove = false;
+
     // region events
     this.currentRegion=null;
     this.regionIndex=0;
     this.lastRegionIndex = -1;
     this.mouseOverRegionIndex = -1;
 };
+
 Events.prototype.getContext = function(){
     return this.context;
 };
+
 Events.prototype.getCanvas = function(){
     return this.canvas;
 };
+
 Events.prototype.clear = function(){
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 };
+
+
 Events.prototype.getCanvasPos = function(){
     var obj = this.getCanvas();
     var top = 0;
@@ -38,10 +45,12 @@ Events.prototype.getCanvasPos = function(){
         left: left
     };
 };
+
 Events.prototype.setStage = function(func){
     this.stage = func;
     this.listen();
 };
+
 Events.prototype.reset = function(evt) {
     if (!evt) {
         evt = window.event;
@@ -51,12 +60,14 @@ Events.prototype.reset = function(evt) {
     if (this.stage !== undefined) {
         this.stage();
     }
+
     // desktop flags
     this.mouseOver = false;
     this.mouseMove = false;
     this.mouseDown = false;
     this.mouseUp = false;
 };
+
 Events.prototype.listen = function() {
     var that = this;
     if (this.stage !== undefined) {
@@ -75,19 +86,17 @@ Events.prototype.listen = function() {
         that.reset(evt);
     }, false);
     this.canvas.addEventListener("mouseover", function (evt) {
-		that.reset(evt);
+        that.reset(evt);
     }, false);
     this.canvas.addEventListener("mouseout", function (evt) {
-		that.mousePos = null;
-		
+        that.mousePos = null;
     }, false);
 };
+
 Events.prototype.getMousePos = function(evt){
     return this.mousePos;
 };
-Events.prototype.getTouchPos = function(evt){
-    return this.touchPos;
-};
+
 Events.prototype.setMousePosition = function(evt){
     var mouseX = evt.clientX - this.getCanvasPos().left + window.pageXOffset;
     var mouseY = evt.clientY - this.getCanvasPos().top + window.pageYOffset;
@@ -96,16 +105,19 @@ Events.prototype.setMousePosition = function(evt){
         y: mouseY
     };
 };
+
 Events.prototype.beginRegion = function(){
     this.currentRegion = {};
     this.regionIndex++;
 };
+
 Events.prototype.addRegionEventListener = function(type, func){
-    var event = (type.indexOf('touch') == -1) ? 'on' + type : type;
+    var event = 'on' + type;
     this.currentRegion[event] = func;
 };
+
 Events.prototype.closeRegion = function(){
-    var pos = this.touchPos || this.mousePos;
+    var pos = this.mousePos;
     if (pos !== null && this.context.isPointInPath(pos.x, pos.y)) {
         if (this.lastRegionIndex != this.regionIndex) {
             this.lastRegionIndex = this.regionIndex;
@@ -121,8 +133,7 @@ Events.prototype.closeRegion = function(){
             this.mouseUp = false;
         }
         // handle onmouseover
-        else if (!this.mouseOver && this.regionIndex != this.mouseOverRegionIndex &&
-            this.currentRegion.onmouseover !== undefined) {
+        else if (!this.mouseOver && this.regionIndex != this.mouseOverRegionIndex && this.currentRegion.onmouseover !== undefined) {
             this.currentRegion.onmouseover();
             this.mouseOver = true;
             this.mouseOverRegionIndex = this.regionIndex;
@@ -131,10 +142,10 @@ Events.prototype.closeRegion = function(){
         else if (!this.mouseMove && this.currentRegion.onmousemove !== undefined) {
             this.currentRegion.onmousemove();
             this.mouseMove = true;
-        }        
-    }
-	// handle mouseout condition
-        else if (this.currentRegion.onmouseout !== undefined) {
-            this.currentRegion.onmouseout();
         }
+    } else if (this.currentRegion.onmouseout !== undefined) {
+        // handle mouseout condition
+        this.currentRegion.onmouseout();
+    }
+
 };
