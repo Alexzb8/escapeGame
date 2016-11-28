@@ -48,9 +48,9 @@ body{
 	   11: LAMP TOGGLE
      */
 	var debug = false;
-    var currentScreen = 0;
+    var currentScreen = 1;
     var timer = 0;
-	var totalResources = 50;
+	var totalResources = 52;
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
 	var images = {};
@@ -67,7 +67,8 @@ body{
 	var bedroomOpening = false;//check if bedroom is opening
 	var bedroomOpening2 = false;//check if bedroom opening animation is at its second stage
 	var monsterAlive = true;
-	var hasDrawerKey = true;
+	var hasDrawerKey = false;
+	var hasMainKey = false; //key to front door
 	var safeOpen = false; //check if safe is open
 	var lampOn = true;
 	var puzzleComplete = false;
@@ -108,6 +109,10 @@ body{
 	//xylophone stick coordinates
 		var stickX = -500;
 		var stickY = 0;
+		
+	//drawer key coordinates
+	var puzzleKeyY = 290;
+	var puzzleKeyX = 500;
 	
 
     // xylophone notes
@@ -262,6 +267,7 @@ body{
 		loadImage("fire1dark");
 		loadImage("xylophone");
 		loadImage("table");
+		loadImage("keyfrompuzzle");
 		loadImage("puzzleboxwpieces");
 		loadImage("puzzleboxwpiecesdark");
 		loadImage("puzzleboxwpiecescomplete");
@@ -272,7 +278,7 @@ body{
 		loadImage("openportrait");
 		loadImage("portraitclose");
 		loadImage("key2");
-		loadImage("poker");
+		loadImage("poker");		
 		loadImage("drawerclosed");
 		loadImage("drawerhalfopened");
 		loadImage("draweropened");
@@ -285,7 +291,8 @@ body{
 		loadImage("lamplightingafter");
         loadImage("lampwithoutstick");
 		loadImage("xylophonefull");
-		loadImage("xylophonehalf");
+		loadImage("xylophonehalf");		
+		loadImage("redkey");
 		
 		//load puzzlepieces
 		for(i=0;i<9;i++){
@@ -665,11 +672,29 @@ body{
 			//puzzle draw
 			function(){
 				var i ;
-				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);
+				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);	
+
+				//draw small box
+				events.context.beginPath();
+				events.context.strokeStyle="#000000";
+				events.context.lineWidth=5;
+				events.context.fillStyle = "#B47524";
+				events.context.rect(puzzleKeyX,puzzleKeyY,100,100);
+				events.context.fill();
+				events.context.stroke();				
+				events.context.closePath();	
+				
+				//draw key				
+				if(!hasDrawerKey){
+					events.context.drawImage(images["keyfrompuzzle"], puzzleKeyX, puzzleKeyY, 100,100);
+					//events.context.drawImage(images["redkey"], puzzleKeyX-5, puzzleKeyY, 100,100);
+				}
+				
 				events.context.drawImage(images["puzzleopened"], 400, 90, 312, 312);
 				for(i=0;i<9;i++){
 					events.context.drawImage(images[i], puzx[i], puzy[i], piecewidth, piecewidth);
 				}
+				
 			},
 			//Portrait draw
 			function(){
@@ -754,6 +779,10 @@ body{
 					else{
 						events.context.drawImage(images["deathdoorangled2"], 0, 0, events.canvas.width, events.canvas.height);
 					}
+					if(!hasMainKey){
+							events.context.drawImage(images["redkey"], 460, 400, 100,100);
+						}
+					
 				}
 				else{
 					if(bedroomOpen){
@@ -762,6 +791,9 @@ body{
 						}
 						else{
 							events.context.drawImage(images["opendoor"], 0, 0, events.canvas.width, events.canvas.height);
+						}
+						if(!hasMainKey){
+							events.context.drawImage(images["redkey"], 460, 400, 100,100);
 						}
 					}
 					else{
@@ -794,9 +826,8 @@ body{
 				createEventShape(880,0,1000,0,1000,360,880,260,6);
 				createEventShape(7,520,229,385,265,416,77,590,5);
 				createEventShape(400,24,430,24,448,90,387,90,11);
-				if(!puzzleComplete){
-					createEventBox(400,380,220,120,2);
-				}
+				createEventBox(400,380,220,120,2);
+				
 				if(!hasWeapon){
 					getItemEvent( 350, 170, 30, 120,function(){
 						hasWeapon = true;
@@ -807,6 +838,13 @@ body{
 			//puzzle events
 			function(){		
 				createEventBox(0,0,100,50,1);
+				//event to get key
+				if(puzzleComplete&&!hasDrawerKey){
+					getItemEvent(puzzleKeyX, puzzleKeyY, 100,100,function(){
+						hasDrawerKey = true;
+						message.displayMess("You got the drawer key");						
+					});
+				}
 				
 				
 				//now manage the pieces
@@ -828,43 +866,55 @@ body{
 							draggingRectOffsetY[i] = mousePos.y - puzy[i];
 						}
 					});
-					events.addRegionEventListener("mouseup", function(){					
-						
-						//now check if pieces are organized
-						for(i=0;i<9;i++){
-							draggingRect[i] = false;
-							if(i==2||i==5){
-								if((puzx[i]-(piecewidth*2)>puzx[i+1]-pixlet)&&(puzx[i]-(piecewidth*2)<puzx[i+1]+pixlet)){
+					events.addRegionEventListener("mouseup", function(){
+					
+						draggingRect[i] = false;
+						if(!puzzleComplete){
+							//now check if pieces are organized
+							for(i=0;i<9;i++){
+								draggingRect[i] = false;
+								if(i==2||i==5){
+									if((puzx[i]-(piecewidth*2)>puzx[i+1]-pixlet)&&(puzx[i]-(piecewidth*2)<puzx[i+1]+pixlet)){
 
-									if((puzy[i] + piecewidth > puzy[i+1]-pixlet)&&(puzy[i] + piecewidth < puzy[i+1]+pixlet)){
-										check++;
+										if((puzy[i] + piecewidth > puzy[i+1]-pixlet)&&(puzy[i] + piecewidth < puzy[i+1]+pixlet)){
+											check++;
+										}
+									}
+								}
+								else if (i==8){
+									check++;
+								}
+								else{
+									if((puzx[i]+piecewidth>puzx[i+1]-pixlet)&&(puzx[i]+piecewidth<puzx[i+1]+pixlet)){
+										if((puzy[i]  > puzy[i+1]-pixlet) && ( puzy[i] < puzy[i+1]+pixlet)){
+											check++;
+										}
 									}
 								}
 							}
-							else if (i==8){
-								check++;
+							
+							//check if all of the pieces are correct
+							if(check == 9){
+								//pieces are organized
+								message.displayMess("You solved the puzzle");
+								check = 0;	
+								puzzleComplete = true;
+								var puzzleKeyAnim = setInterval(function(){
+									console.log("puzzlekey animation loop "+puzzleKeyY);
+									if(puzzleKeyY>400){
+										clearInterval(puzzleKeyAnim);
+										
+									}
+									else{
+										puzzleKeyY++;
+									}
+								},20);
+								
 							}
 							else{
-								if((puzx[i]+piecewidth>puzx[i+1]-pixlet)&&(puzx[i]+piecewidth<puzx[i+1]+pixlet)){
-									if((puzy[i]  > puzy[i+1]-pixlet) && ( puzy[i] < puzy[i+1]+pixlet)){
-										check++;
-									}
-								}
+								check = 0;
 							}
 						}
-						
-						//check if all of the pieces are correct
-						if(check == 9){
-							//pieces are organized
-							message.displayMess("You solved the puzzle :D");
-							check = 0;	
-							puzzleComplete = true;
-							changeScreen(1);
-							
-						}
-						else{
-							check = 0;
-						}					
 					});
 					events.addRegionEventListener("mouseout", function () {
 						document.body.style.cursor = "default";
@@ -1048,6 +1098,12 @@ body{
 					if(bedroomOpen){
 						//change coordinates to correct door location
 						getItemEvent(670, 10, 310, 530,function(){toggledoor();});
+						if(!hasMainKey){
+							getItemEvent(460, 400, 100,100,function(){
+								hasMainKey = true;
+								message.displayMess("You found the front door key!");
+							});
+						}
 					}
 					else{						
 												
@@ -1111,12 +1167,15 @@ body{
 				events.context.fillText("ToolBox", 4, 25);
 				
 				
-				if(hasBedroomKey){	
-					//using text of key 2 somehow glitches
+				if(hasBedroomKey){
 					events.context.drawImage(images["key2"], 20, 40, 50, 50);
 				}
 				if(hasWeapon){
 					events.context.drawImage(images["poker"], 30, 100, 50, 50);
+				}
+				if(hasDrawerKey){	
+					//using text of key 2 somehow glitches
+					events.context.drawImage(images["keyfrompuzzle"], 20, 160, 50, 50);
 				}
 			}
 			
