@@ -42,7 +42,6 @@ body{
      * 8: winning screen
      * 9: death by monster screen
      * 10: death by timer screen
-	   11: LAMP TOGGLE
      */
 	var debug = false;
     var currentScreen = 1;
@@ -214,13 +213,7 @@ body{
 	
 	}
 	function changeScreen(screen){
-		//verify change of screen was handled correctly according to lamp state
-		if(screen==11 && currentScreen==1){
-			screen = 1;
-			lampOn = !lampOn;
-		}
-		currentScreen = screen;
-		
+		currentScreen = screen;		
 	}
 	function loadImage(name) {
 		//add image to images array and check if loaded
@@ -822,8 +815,12 @@ body{
 				createEventBox(0,0,100,50,0);
 				createEventShape(880,0,1000,0,1000,360,880,260,6);
 				createEventShape(7,520,229,385,265,416,77,590,5);
-				createEventShape(400,24,430,24,448,90,387,90,11);
 				createEventBox(400,380,220,120,2);
+				
+				
+				getItemEvent(387,24,61,66,function(){				
+					lampOn = !lampOn;
+				});		
 				
 				if(!hasWeapon){
 					getItemEvent( 350, 170, 30, 120,function(){
