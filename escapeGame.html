@@ -65,7 +65,7 @@ body{
 	var finishedLoading = false;
 	var images = {};
 	var hasBedroomKey = true; // until they get it from the portrait
-    var hasWeapon = false; // until they get the fire poker
+    var hasWeapon = true; // until they get the fire poker
     var hasStick = false; // until they get the stick from the lampshade
     var lampOn = false;
 	var puzzleComplete = false;
@@ -189,7 +189,7 @@ body{
         loadImage("draweropened");
         loadImage("deathdoorangled");
         loadImage("deathdoorangled2");
-        loadImage("deathdoorangledwithmonster");
+        loadImage("deathdoorangled2withmonster");
         loadImage("poker");
 
 		for(i=0;i<9;i++){
@@ -754,7 +754,7 @@ body{
                 events.context.drawImage(images["deathdoorangled"], 0, 0, events.canvas.width, events.canvas.height);
                 setTimeout(function(){
                     events.clear();
-                    events.context.drawImage(images["deathdoorangledwithmonster"], 0, 0, events.canvas.width, events.canvas.height);
+                    events.context.drawImage(images["deathdoorangled2withmonster"], 0, 0, events.canvas.width, events.canvas.height);
 
                     // TODO PLAY AUDIO OF MONSTER DYING
 
@@ -771,7 +771,7 @@ body{
                 events.context.drawImage(images["deathdoorangled"], 0, 0, events.canvas.width, events.canvas.height);
                 setTimeout(function(){
                     events.clear();
-                    events.context.drawImage(images["deathdoorangledwithmonster"], 0, 0, events.canvas.width, events.canvas.height);
+                    events.context.drawImage(images["deathdoorangled2withmonster"], 0, 0, events.canvas.width, events.canvas.height);
 
                     // TODO PLAY AUDIO OF MONSTER DYING
 
