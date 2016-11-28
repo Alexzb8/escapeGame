@@ -96,21 +96,21 @@ body{
 	var death = AudioFX('audio/death',   { formats: ['wav'], pool: 100 });
 	//monster death sound
 	var monsterdeath = AudioFX('audio/monsterdeath',   { formats: ['wav'], pool: 100 });
-	
-	
+
+
 
     // xylophone notes
     var noteRow = [];
-	
+
 	//create xylophone puzzle notes
 	var noteLetters = ["C","D","E","F","G","A","B"];
 	var xylophoneAnswer = [];
 	var numNotes = 6;            //number of notes user has to input
 	var inputNotes = [numNotes];
-	var noteString = "";	
+	var noteString = "";
 	for(i = 0 ; i<numNotes;i++){
 		xylophoneAnswer[i] = random(0,6);
-		
+
 		if(i==0){
 			noteString = noteString +  noteLetters[xylophoneAnswer[i]];
 		}
@@ -119,17 +119,17 @@ body{
 		}
 	}
 	console.log(noteString);
-	
+
 	//portrait code
 	var portraitCode = [4];
 	var portraitInput = [0,0,0,0];
-	
-	for(i=0;i<4;i++){	
-		portraitCode[i] = random(0,9);		
+
+	for(i=0;i<4;i++){
+		portraitCode[i] = random(0,9);
 	}
 	console.log(portraitCode);
 
-	
+
 	// Returns a random integer between min (included) and max (included)
 	function random(min, max) {
 	  min = Math.ceil(min);
@@ -138,35 +138,35 @@ body{
 	}
 	function newNote(note){
 		//input new note into array and check if all notes are equal
-		
+
 		var equal = 0;
 		var i = 0;
-	
+
 		for(i=0;i<numNotes-1;i++){
 			inputNotes[i] = inputNotes[i+1];
 			if(inputNotes[i]==xylophoneAnswer[i]){equal++;}
 		}
-		
+
 		inputNotes[i] = note;
 		if(inputNotes[i]==xylophoneAnswer[i]){
-			
+
 			equal++;
 			if(equal==6){
-				//puzzle is solved			
+				//puzzle is solved
 				solvedXylo = true;
 				message.displayMess("You pressed the right keys Xp");
 				changeScreen(1);
-				
+
 			}
-			
+
 		}
-		
-		
-	
+
+
+
 	}
 	function newInputPortrait(up,num){
 		//change array of input of portrait
-				
+
 		if(up){
 			if(portraitInput[num]<9){
 				portraitInput[num]++;
@@ -183,11 +183,11 @@ body{
 				portraitInput[num]=9;
 			}
 		}
-		
-		
-		
-		
-	
+
+
+
+
+
 	}
 	function changeScreen(screen){
 		//verify change of screen was handled correctly according to lamp state
@@ -196,7 +196,7 @@ body{
 			lampOn = !lampOn;
 		}
 		currentScreen = screen;
-		
+
 	}
 	function loadImage(name) {
 		//add image to images array and check if loaded
@@ -229,7 +229,7 @@ body{
 		loadImage("SCREENWIN");
 		loadImage("opendoor");
 		loadImage("monster");
-		loadImage("livingroom");
+		loadImage("backgroundwithphotos");
 		loadImage("hallway");
 		loadImage("closeddoor");
 		loadImage("fire1");
@@ -258,18 +258,18 @@ body{
 		loadImage("deathdoorangled2");
 		loadImage("deathdoorangled2withmonster");
 		loadImage("monster");
-		loadImage("opendoor");	
+		loadImage("opendoor");
 		loadImage("SCREENMONSTER");
 		loadImage("lamplightingafter");
         loadImage("lampwithoutstick");
-		
+
 		//load puzzlepieces
 		for(i=0;i<9;i++){
 			loadImage(i);
 		}
-        
 
-		
+
+
 
         // fill in each note of the close-up xylophone
         noteRow[0] = new Note(0,"cNote", 17, 334, 175,
@@ -286,11 +286,11 @@ body{
             665, context);
         noteRow[6] = new Note(6,"bNote", 873, 405, 989,
             665, context);
-			
-		
+
+
 
     }
-	function createEventBox(x,y,width,height,screen){		
+	function createEventBox(x,y,width,height,screen){
 		createEventShape(
 		x,
 		y,
@@ -300,10 +300,10 @@ body{
 		y+height,
 		x,
 		y+height,
-		screen);		
+		screen);
 	}
 	function createEventShape(x,y,x1,y1,x2,y2,x3,y3,screen){
-			
+
 			events.beginRegion();
 			events.context.beginPath();
 			//events.context.fillStyle = "#00D2FF";
@@ -312,35 +312,35 @@ body{
 			events.context.lineTo(x2,y2);
 			events.context.lineTo(x3,y3);
 			//events.context.fill();
-			events.context.closePath();	
-			events.addRegionEventListener("mousedown",function(){				
+			events.context.closePath();
+			events.addRegionEventListener("mousedown",function(){
 				changeScreen(screen);
 			});
 			events.addRegionEventListener("mousemove", function () {
 					document.body.style.cursor = "pointer";
 			});
-			
+
 			events.closeRegion();
-		
+
 	}
 	function getItemEvent(x,y,width,height,item){
-			
+
 			events.beginRegion();
 			events.context.beginPath();
 			//events.context.fillStyle = "#00D2FF";
 			events.context.rect(x,y,width,height);
 			//events.context.fill();
-			events.context.closePath();	
+			events.context.closePath();
 			events.addRegionEventListener("mousedown",function(){
 				if(item=="bedroomkey"){
 					hasBedroomKey = true;
 					message.displayMess("You found the bedroom key");
-					
+
 				}
 				else if(item=="poker"){
 					hasWeapon = true;
 					message.displayMess("You found a weapon!");
-					
+
 				}
 				else if(item=="openportrait"){
 					portraitOpen = !portraitOpen;
@@ -354,39 +354,39 @@ body{
 					setTimeout(function(){ drawerOpening = false; }, 500);
 				}
 				else if(item=="toggledoor"){
-				
+
 					if(hasBedroomKey){
-						
+
 						//animate bedroom door
 						if(bedroomOpen){
 							//animate bedroom closing
-							bedroomOpening2 = true;							
-							
+							bedroomOpening2 = true;
+
 							setTimeout(function(){
-								bedroomOpening = true; 
-								bedroomOpening2 = false;					
-								
+								bedroomOpening = true;
+								bedroomOpening2 = false;
+
 								setTimeout(function(){
 									bedroomOpening = false;
 									bedroomOpen = false;
-								}, 500);								
+								}, 500);
 							}, 500);
 						}
 						else{
-							//animate bedroom opening							
+							//animate bedroom opening
 							message.displayMess("You used the bedroom key");
 							bedroomOpening = true;
 							bedroomOpen = !bedroomOpen;
-							
-							
+
+
 							setTimeout(function(){
-								bedroomOpening = false; 
-								bedroomOpening2 = true;					
-								
+								bedroomOpening = false;
+								bedroomOpening2 = true;
+
 								setTimeout(function(){
 									bedroomOpening2 = false;
 									bedroomOpen = true;
-									
+
 									if(monsterAlive){
 										if(hasWeapon){
 											message.displayMess("Used weapon on monster");
@@ -394,55 +394,55 @@ body{
 											monsterdeath.play();
 											//kill monster
 											setTimeout(function(){
-												monsterAlive = false;												
-											}, 1500);	
-											
+												monsterAlive = false;
+											}, 1500);
+
 										}
 										else{
 											//play dying sound
 											death.play();
 											//change screen
 											setTimeout(function(){
-												changeScreen(9);												
-											}, 1500);											
+												changeScreen(9);
+											}, 1500);
 										}
 									}
-									
-								}, 500);								
+
+								}, 500);
 							}, 500);
-						
+
 						}
 					}
 					else{
 						message.displayMess("You dont have the key");
 					}
-					
-					
-					
+
+
+
 				}
 				else if(item=="enter"){
 					//check if code is correct
 					var equal = 0;
 					for(i=0;i<4;i++){
-					
+
 						if(portraitInput[i]==portraitCode[i]){
 							equal++;
 						}
-					
+
 					}
-					
+
 					if(equal==4){
-						//pasword correct	
+						//pasword correct
 						bing.play();
 						safeOpen = true;
 						message.displayMess("Password is correct");
-						
+
 					}
 					else{
 						//play error sound
 						bing.play();
 					}
-				
+
 				}
 				else if(item=="0up"){
 					newInputPortrait(true,0);
@@ -468,18 +468,18 @@ body{
 				else if(item=="3down"){
 					newInputPortrait(false,3);
 				}
-				
-				
+
+
 			});
 			events.addRegionEventListener("mousemove", function () {
 					document.body.style.cursor = "pointer";
 			});
-			
+
 			events.closeRegion();
-		
+
 	}
 	function drawSafe(){
-		
+
 		var x = 570;
 		var y = 320;
 		for(i=0;i<4;i++){
@@ -494,7 +494,7 @@ body{
 			events.context.closePath();
 			events.context.fill();
 			events.context.stroke();
-			
+
 			events.context.beginPath();
 			events.context.lineWidth = 4;
 			events.context.strokeStyle = "black";
@@ -502,25 +502,25 @@ body{
 			events.context.moveTo(x,y+55);
 			events.context.lineTo(x+50,y+55);
 			events.context.lineTo(x+25,y+105);
-			events.context.closePath();	
+			events.context.closePath();
 			events.context.fill();
 			events.context.stroke();
-		
+
 			//draw number
 			events.context.save();
 			events.context.font = '60pt Georgia';
 			events.context.fillStyle= "black";
-			events.context.fillText(portraitInput[i], x, y);				
+			events.context.fillText(portraitInput[i], x, y);
 			events.context.restore();
 			x = x + 101;
 		}
-	
+
 	}
 	function checkregion(mouse){
 
 	}
 	function drawStick(cursorX,cursorY) {
-			
+
 		events.context.beginPath();
 		events.context.arc(cursorX, cursorY, 30, 0, 2 * Math.PI, true);
 		events.context.fillStyle = "#FF6A6A";
@@ -549,11 +549,11 @@ body{
         this.topLeftY = topLeftY;
         this.topRightX = topRightX;
         this.bottomLeftY = bottomLeftY;
-		
+
         this.width = topRightX - topLeftX;
         this.height = bottomLeftY - topLeftY;
 		this.drawBox = function(){
-			
+
 			this.alpha = this.alpha - .01;
 			if(this.alpha>0){
 				ctx = events.context;
@@ -562,7 +562,7 @@ body{
 				ctx.rect(this.topLeftX, this.topLeftY, this.width, this.height);
 				ctx.fillStyle = "rgba(255, 0, 0, " + this.alpha + ")";
 				ctx.fill();
-				ctx.closePath();				
+				ctx.closePath();
 				ctx.restore();
 			}
 			else{
@@ -574,7 +574,7 @@ body{
 		this.alpha = 1.0;
 		this.noteAudio.play();
 		//update and check note input array
-      	newNote(this.noteNum);        
+      	newNote(this.noteNum);
     };
     Note.prototype.keyDidPlay = function(stickX, stickY) {
         if (stickX >= this.topLeftX && stickX <= this.topRightX
@@ -592,7 +592,7 @@ body{
 			this.alpha = 1.0
 		};
 		this.drawMessage = function(){
-			
+
 			if(this.alpha>0){
 				//draw message
 				events.context.save();
@@ -601,15 +601,15 @@ body{
 				events.context.strokeStyle = "rgba(0, 0, 0, " + this.alpha + ")";
 				events.context.fillStyle= "rgba(255, 255, 255, " + this.alpha + ")";
 				events.context.fillText(this.text, 0, 680);
-				events.context.strokeText(this.text, 0, 680);				
+				events.context.strokeText(this.text, 0, 680);
 				events.context.restore();
-			
+
 				this.alpha = this.alpha - 0.01;
 			}
-			
-		
+
+
 		};
-	
+
 	}
 	    // if they click on the bedroom door AFTER they are at the close up view (not if they are just inside the hallway still)
     function attemptUnlockUpCloseBedroomDoor(canvas,context) {
@@ -638,11 +638,11 @@ body{
 		var draggingRectOffsetY = [0,0,0,0,0,0,0,0,0];
 		var piecewidth = 69;
 		var context = events.context;
-		var pixlet = 10;//how many pixels we can be not correctly placed	
+		var pixlet = 10;//how many pixels we can be not correctly placed
 		//xylophone stick coordinates
 		var stickX = -500;
 		var stickY = 0;
-		
+
 		screens = [
 			//main menu draw
 			function(){
@@ -652,10 +652,10 @@ body{
 			function(){
 				time = Date.now();
 				var firestring ;
-				
+
 				if(lampOn){
 					firestring = "fire"+fireCount;
-					events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+					events.context.drawImage(images["backgroundwithphotos"], 0, 0, events.canvas.width, events.canvas.height);
 					if(puzzleComplete){
 						events.context.drawImage(images["puzzleboxwpiecescomplete"], 440, 370, 120, 120);
 					}
@@ -678,14 +678,14 @@ body{
 						events.context.drawImage(images["puzzleboxwpiecesdark"], 440, 370, 120, 120);
 					}
 				}
-				
-				
+
+
 				if(!hasWeapon){
 					events.context.drawImage(images["poker"], 317, 170, 120, 120);
 				}
-				
+
 				//draw light switch?
-				
+
 				events.context.drawImage(images[firestring], 170, 170, 200, 200);
 				if(time>d+100){
 					fireCount++;
@@ -693,7 +693,7 @@ body{
 				}
 				if(fireCount==4){
 					fireCount=1;
-				}			
+				}
 			},
 			//puzzle draw
 			function(){
@@ -715,7 +715,7 @@ body{
 					if(!hasBedroomKey){
 						events.context.drawImage(images["key2"], 650, 220, 200, 200);
 					}
-					
+
 				}
 				else if(portraitOpen){
 					events.context.drawImage(images["openportrait"], 0, 0, events.canvas.width, events.canvas.height);
@@ -724,13 +724,13 @@ body{
 				else{
 					events.context.drawImage(images["portraitclose"], 0, 0, events.canvas.width, events.canvas.height);
 				}
-				
+
 			},
 			//Drawer draw
 			function(){
 				if (drawerOpening) {
 						events.context.drawImage(images["drawerhalfopened"], 0, 0, events.canvas.width, events.canvas.height);
-				} 
+				}
 				else if(!drawerOpen){
 					events.context.drawImage(images["drawerclosed"], 0, 0, events.canvas.width, events.canvas.height);
 				}
@@ -739,26 +739,26 @@ body{
 						events.context.font = "30px Arial";
 						events.context.fillStyle = "#000000";
 						events.context.fillText(noteString, 400, 550);
-						
+
 				}
 			},
 			//xylophone draw
 			function(){
 				events.context.drawImage(images["xylophone"], 0, 0, events.canvas.width, events.canvas.height);
-				
+
 				var i ;
-				
+
 				for(i=0;i<7;i++){
 					noteRow[i].drawBox();
 				}
-				
+
 				drawStick(stickX,stickY);
-				
+
 			},
 			//hallway Draw
 			function(){
 				events.context.drawImage(images["hallway"], 0, 0, events.canvas.width, events.canvas.height);
-			
+
 			},
 			//bedroom draw
 			function(){
@@ -785,20 +785,20 @@ body{
 					else{
 						events.context.drawImage(images["closeddoor"], 0, 0, events.canvas.width, events.canvas.height);
 					}
-				
+
 				}
-				
+
 			},
 			function(){
 			},
 			//death by monster draw
-			function(){			
+			function(){
 				events.context.drawImage(images["SCREENMONSTER"], 0, 0, events.canvas.width, events.canvas.height);
 			},
 			function(){
 			}
 		];
-		
+
 		drawEvents = [
 			//main menu events
 			function(){
@@ -822,22 +822,22 @@ body{
 				}
 			},
 			//puzzle events
-			function(){		
+			function(){
 				createEventBox(0,0,100,50,1);
-				
-				
+
+
 				//now manage the pieces
 				for(i=0;i<9;i++){
 					if (draggingRect[i]) {
 						var mousePos = events.getMousePos();
 						puzx[i] = mousePos.x - draggingRectOffsetX[i];
-						puzy[i] = mousePos.y - draggingRectOffsetY[i];					
+						puzy[i] = mousePos.y - draggingRectOffsetY[i];
 					}
-					
+
 					events.beginRegion();
 					events.context.rect(puzx[i], puzy[i], piecewidth,piecewidth);
-					events.addRegionEventListener("mousedown", function(){						
-						
+					events.addRegionEventListener("mousedown", function(){
+
 						var mousePos = events.getMousePos();
 						if( mousePos.x - puzx[i]< piecewidth &&  mousePos.x - puzx[i]>0){
 							draggingRect[i] = true;
@@ -845,8 +845,8 @@ body{
 							draggingRectOffsetY[i] = mousePos.y - puzy[i];
 						}
 					});
-					events.addRegionEventListener("mouseup", function(){					
-						
+					events.addRegionEventListener("mouseup", function(){
+
 						//now check if pieces are organized
 						for(i=0;i<9;i++){
 							draggingRect[i] = false;
@@ -869,19 +869,19 @@ body{
 								}
 							}
 						}
-						
+
 						//check if all of the pieces are correct
 						if(check == 9){
 							//pieces are organized
 							message.displayMess("You solved the puzzle :D");
-							check = 0;	
+							check = 0;
 							puzzleComplete = true;
 							changeScreen(1);
-							
+
 						}
 						else{
 							check = 0;
-						}					
+						}
 					});
 					events.addRegionEventListener("mouseout", function () {
 						document.body.style.cursor = "default";
@@ -890,10 +890,10 @@ body{
 						document.body.style.cursor = "pointer";
 					});
 					events.closeRegion();
-					
-					
+
+
 				}
-			
+
 			},
 			//portrait events
 			function(){
@@ -920,13 +920,13 @@ body{
 					createEventBox(0,0,480,700,1);
 					//to open portrait
 					getItemEvent(490,60,500,550,"openportrait");
-					
+
 				}
 			},
 			//drawer events
 			function(){
 				if(!drawerOpening){
-					if (!drawerOpen) {				
+					if (!drawerOpen) {
 						createEventBox(0,0,100,50,1); // BACK BUTTON
 						if (hasDrawerKey) {
 							getItemEvent(240, 370, 520, 100, "opendrawer");
@@ -935,27 +935,27 @@ body{
 					else {
 							createEventBox(0,0,100,50,1); // BACK BUTTON
 							getItemEvent(110, 600, 780, 95, "opendrawer");
-							
-						
+
+
 					}
 				}
-			
+
 			},
 			//xylophone events
 			function(){
-			
+
 				var mousePos = events.getMousePos();
 				stickX = mousePos.x ;
 				stickY = mousePos.y ;
-				createEventBox(0,0,1000,320,1);				
-				
+				createEventBox(0,0,1000,320,1);
+
 				events.beginRegion();
 				events.context.beginPath();
 				//events.context.lineWidth = 4;
 				//events.context.strokeStyle = "black";
 				//events.context.fillStyle = "#00D2FF";
 				events.context.rect(0,322,1000,378);
-				events.context.closePath();		
+				events.context.closePath();
 				//events.context.fill();
 				//events.context.stroke();
 				events.addRegionEventListener("mousedown",function(){
@@ -967,8 +967,8 @@ body{
 					}
 				});
 				events.closeRegion();
-				document.body.style.cursor = "none";	//no cursor	
-			
+				document.body.style.cursor = "none";	//no cursor
+
 			},
 			//hallway events
 			function(){
@@ -985,8 +985,8 @@ body{
 						//change coordinates to correct door location
 						getItemEvent(670, 10, 310, 530,"toggledoor");
 					}
-					else{						
-												
+					else{
+
 						getItemEvent(345, 10, 310, 530,"toggledoor");
 					}
 				}
@@ -998,35 +998,35 @@ body{
 			function(){
 			}
 		];
-	
-	
+
+
 	}
-	
+
 	function game(){
 		events = new Events("canvasOne");
 		var anim = new Animation("canvasOne");
 		var canvas = anim.getCanvas();
 		var context = anim.getContext();
-		
-		
+
+
 		createScreens(); //create function arrays to handle drawing and events
-		
+
 		document.addEventListener("keypress", function(event) {
 			toolbox = !toolbox;
 		});
-		
+
 		events.setStage(function () {
 			document.body.style.cursor = "default";
-			drawEvents[currentScreen]();			
+			drawEvents[currentScreen]();
 		});
-		
-		
+
+
 		anim.setStage(function() {
 			console.log("anim loop");
-			
-			this.clear();			
+
+			this.clear();
 			screens[currentScreen]();
-			
+
 			if(toolbox && currentScreen != 0){
 				//draw toolbox
 				events.context.beginPath();
@@ -1037,13 +1037,13 @@ body{
 				events.context.fill();
 				events.context.stroke();
 				events.context.closePath();
-				
+
 				events.context.font = "25px Georgia";
 				events.context.fillStyle= "black";
 				events.context.fillText("ToolBox", 4, 25);
-				
-				
-				if(hasBedroomKey){	
+
+
+				if(hasBedroomKey){
 					//using text of key 2 somehow glitches
 					events.context.drawImage(images["key2"], 20, 40, 50, 50);
 				}
@@ -1051,13 +1051,13 @@ body{
 					events.context.drawImage(images["poker"], 30, 100, 50, 50);
 				}
 			}
-			
-			
+
+
 			message.drawMessage();
-		
+
 		});
 		anim.start();
-	
+
 	}
 
     window.onload = function() {
