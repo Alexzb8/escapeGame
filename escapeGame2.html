@@ -337,7 +337,8 @@ body{
 			events.context.lineTo(x3,y3);
 			//events.context.fill();       // comment to avoid flicker
 			events.context.closePath();	
-			events.addRegionEventListener("mousedown",function(){				
+			events.addRegionEventListener("mousedown",function(){
+				
 				changeScreen(screen);
 			});
 			events.addRegionEventListener("mousemove", function () {
@@ -665,7 +666,7 @@ body{
 			function(){
 				var i ;
 				events.context.drawImage(images["table"], 0, 0, events.canvas.width, events.canvas.height);
-				events.context.drawImage(images["puzzleopened"], 400, 90, 350, 350);
+				events.context.drawImage(images["puzzleopened"], 400, 90, 312, 312);
 				for(i=0;i<9;i++){
 					events.context.drawImage(images[i], puzx[i], puzy[i], piecewidth, piecewidth);
 				}
