@@ -45,7 +45,6 @@ body{
      */
 	var debug = false;
     var currentScreen = 1;
-    var timer = 0;
 	var totalResources = 52;
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
@@ -85,6 +84,11 @@ body{
 	var drawEvents = [];
 	//time for animations
 	var d = Date.now();
+	//time for timer
+	//timer
+	var timer = new Timer();
+	
+	
 	//messages
 	var message = new Message;
 	var toolbox = false; //condition to draw toolbox
@@ -504,7 +508,79 @@ body{
 		events.context.stroke();
 		events.context.closePath();
 	}
-    // defining each note on the xylophone
+    function Timer(){
+		this.minutes = 0;
+		this.seconds = 0;
+		this.m = Date.now();
+		this.s = Date.now();
+		this.time = Date.now();
+		this.separation = 40;  //separation between seconds and minutes
+		
+		this.moreTime = function(){
+			this.time = Date.now();
+		}
+		
+		this.drawMinutes = function(x,y){
+			
+			var text = "";
+			if (this.minutes<10){
+				text = "0"+this.minutes;
+			}
+			else{
+				text = this.minutes;
+			}
+			
+			events.context.save();
+			events.context.font = '20pt Georgia';
+			events.context.lineWidth = 3;
+			events.context.strokeStyle = "black";
+			events.context.fillStyle= "white";
+			events.context.fillText(text, x,y);
+			events.context.strokeText(text, x,y);				
+			events.context.restore();
+		};
+		
+		this.drawSeconds = function(x,y){
+		
+			if(this.s+1000 <= this.time){
+				this.s = Date.now();
+				this.seconds++;
+				if(this.seconds==60){
+					this.seconds = 0;
+					this.minutes++;
+					if(this.minutes == 60){
+						this.minutes = 0;
+					}
+				}	
+			}
+		
+		
+			var text = "";
+			if (this.seconds<10){
+				text = "0"+this.seconds;
+			}
+			else{
+				text = this.seconds;
+			}
+			
+			events.context.save();
+			events.context.font = '20pt Georgia';
+			events.context.lineWidth = 3;
+			events.context.strokeStyle = "black";
+			events.context.fillStyle= "white";
+			events.context.fillText(": " + text, x,y);
+			events.context.strokeText(": " + text, x,y);				
+			events.context.restore();
+		};
+		
+		this.drawTime = function(x,y){
+			this.moreTime();
+			this.drawSeconds(x+this.separation,y);
+			this.drawMinutes(x,y);
+		};
+	}
+	
+	// defining each note on the xylophone
     function Note(num, note, topLeftX, topLeftY, topRightX, bottomLeftY, context) {
         this.ctx = context;
 
@@ -1166,6 +1242,7 @@ body{
 		var context = anim.getContext();
 		
 		
+		
 		createScreens(); //create function arrays to handle drawing and events
 		
 		document.addEventListener("keypress", function(event) {
@@ -1238,6 +1315,9 @@ body{
 			
 			
 			message.drawMessage();
+			
+			//timer
+			timer.drawTime(900,680);
 		
 		});
 		anim.start();
