@@ -53,6 +53,8 @@ body{
 	var hasBedroomKey = false; // until they get it from the portrait
     var hasWeapon = false; // until they get the fire poker
     var hasStick = false; // until they get the stick from the lampshade
+	var hasDrawerKey = false;
+	var hasMainKey = false; //key to front door
 	var portraitOpen = false;
 	var portraitOpening = false;//check if portrait is opening
 	var drawerOpen = false;
@@ -63,8 +65,6 @@ body{
 	var bedroomOpening = false;//check if bedroom is opening
 	var bedroomOpening2 = false;//check if bedroom opening animation is at its second stage
 	var monsterAlive = true;
-	var hasDrawerKey = false;
-	var hasMainKey = false; //key to front door
 	var safeOpen = false; //check if safe is open
 	var lampOn = true;
 	var puzzleComplete = false;
@@ -367,8 +367,11 @@ body{
 			events.beginRegion();
 			events.context.beginPath();
 			//events.context.fillStyle = "#00D2FF";
+			//events.context.strokeStyle="#000000";
+			//events.context.lineWidth=5;
 			events.context.rect(x,y,width,height);
 			//events.context.fill();
+			//events.context.stroke();
 			events.context.closePath();	
 			events.addRegionEventListener("mousedown",function(){			
 				toDo();				
@@ -749,7 +752,11 @@ body{
 					noteRow[i].drawBox();
 				}
 				
-				drawStick(stickX,stickY);
+				//draw stick
+				if(hasStick){
+					drawStick(stickX,stickY);
+				}
+				
 				
 			},
 			//hallway Draw
@@ -818,9 +825,29 @@ body{
 				createEventBox(400,380,220,120,2);
 				
 				
-				getItemEvent(387,24,61,66,function(){				
-					lampOn = !lampOn;
+				
+				getItemEvent(387,24,61,66,function(){
+					
+					if(!lampOn && !hasStick){
+						var stickX = 415;
+						var stickY = 40;
+						var stickW = 10;
+						var stickH = 40;
+						
+						getItemEvent(stickX,stickY,stickW,stickH,function(){
+							message.displayMess("You found a xylophone stick");
+							hasStick = true;
+							lampOn = !lampOn;
+						});
+						lampOn = !lampOn;
+					}
+					else {
+						lampOn = !lampOn;
+					}
+					
 				});		
+				
+				
 				
 				if(!hasWeapon){
 					getItemEvent( 350, 170, 30, 120,function(){
@@ -894,7 +921,6 @@ body{
 								check = 0;	
 								puzzleComplete = true;
 								var puzzleKeyAnim = setInterval(function(){
-									console.log("puzzlekey animation loop "+puzzleKeyY);
 									if(puzzleKeyY>400){
 										clearInterval(puzzleKeyAnim);
 										
@@ -1034,6 +1060,8 @@ body{
 			//xylophone events
 			function(){			
 				
+				
+				
 				if(xylophoneOpen){
 					xylophoneEventShape(0,0,1000,0,1000,150,0,75,1);	
 				}
@@ -1067,15 +1095,28 @@ body{
 				//events.context.fill();
 				//events.context.stroke();
 				events.addRegionEventListener("mousedown",function(){
-					for (var i = 0; i < 7; i++) {
-						if (noteRow[i].keyDidPlay()) {
-							noteRow[i].playSelf();
-							currentnote = i;
+					if(hasStick){
+						for (var i = 0; i < 7; i++) {
+							if (noteRow[i].keyDidPlay()) {
+								noteRow[i].playSelf();
+								currentnote = i;
+							}
 						}
+					}
+					else{
+						message.displayMess("You need a stick");
 					}
 				});
 				events.closeRegion();
-				document.body.style.cursor = "none";	//no cursor	
+				
+				if(hasStick){
+					document.body.style.cursor = "none";	//no cursor	
+				}
+				else{
+					document.body.style.cursor = "default";
+				}
+				
+				
 			
 			},
 			//hallway events
@@ -1131,8 +1172,7 @@ body{
 			toolbox = !toolbox;
 		});
 		
-		events.setStage(function () {
-			
+		events.setStage(function () {			
 			document.body.style.cursor = "default";
 			drawEvents[currentScreen]();			
 		});
@@ -1175,9 +1215,24 @@ body{
 				if(hasDrawerKey){
 					events.context.drawImage(images["keyfrompuzzle"], 20, 160, 50, 50);
 				}
-				if(hasMainKey){	
-					//using text of key 2 somehow glitches
+				if(hasMainKey){
 					events.context.drawImage(images["redkey"], 20, 220, 50, 50);
+				}
+				if(hasStick){
+					events.context.beginPath();
+					events.context.arc(47, 300, 10, 0, 2 * Math.PI, true);
+					events.context.fillStyle = "#FF6A6A";
+					events.context.strokeStyle = "#FF6A6A";
+					events.context.lineWidth = 7;
+					events.context.closePath();
+					events.context.fill();
+
+					events.context.beginPath();
+					events.context.lineWidth = 2;
+					events.context.moveTo(47 , 300);
+					events.context.lineTo(47, 340);
+					events.context.stroke();
+					events.context.closePath();					
 				}
 			}
 			
