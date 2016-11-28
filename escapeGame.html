@@ -65,7 +65,7 @@ body{
 	var finishedLoading = false;
 	var images = {};
 	var hasBedroomKey = true; // until they get it from the portrait
-    var hasWeapon = false; // until they get the fire poker
+    var hasWeapon = true; // until they get the fire poker
     var hasStick = false; // until they get the stick from the lampshade
     var lampOn = false;
 	var puzzleComplete = false;
@@ -189,7 +189,7 @@ body{
         loadImage("draweropened");
         loadImage("deathdoorangled");
         loadImage("deathdoorangled2");
-        loadImage("deathdoorangledwithmonster");
+        loadImage("deathdoorangled2withmonster");
         loadImage("poker");
 
 		for(i=0;i<9;i++){
@@ -213,7 +213,7 @@ body{
             683, context);
         noteRow[2] = new Note(2,"eNote", 336, 371, 472,
             673, context);
-        noteRow[3] = new Note(3,"fNote", 473, 381, 607,
+        noteRow[3] = new Note(3,"fNote", 473, 381, 615,
             673, context);
         noteRow[4] = new Note(4,"gNote", 615, 390, 742,
             673, context);
@@ -754,7 +754,7 @@ body{
                 events.context.drawImage(images["deathdoorangled"], 0, 0, events.canvas.width, events.canvas.height);
                 setTimeout(function(){
                     events.clear();
-                    events.context.drawImage(images["deathdoorangledwithmonster"], 0, 0, events.canvas.width, events.canvas.height);
+                    events.context.drawImage(images["deathdoorangled2withmonster"], 0, 0, events.canvas.width, events.canvas.height);
 
                     // TODO PLAY AUDIO OF MONSTER DYING
 
@@ -771,7 +771,7 @@ body{
                 events.context.drawImage(images["deathdoorangled"], 0, 0, events.canvas.width, events.canvas.height);
                 setTimeout(function(){
                     events.clear();
-                    events.context.drawImage(images["deathdoorangledwithmonster"], 0, 0, events.canvas.width, events.canvas.height);
+                    events.context.drawImage(images["deathdoorangled2withmonster"], 0, 0, events.canvas.width, events.canvas.height);
 
                     // TODO PLAY AUDIO OF MONSTER DYING
 
