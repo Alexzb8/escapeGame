@@ -6,16 +6,15 @@
 <style>
 body{
 	background-color:black;
-	margin: 0;
+	margin : 0;
+	display: block;
 }
 #game{
-	display:block;
-	width :1000px;
-	margin-left: auto;
-	margin-right: auto;
 }
 #canvasOne{
-	margin:0;
+	overflow:hidden;
+	display: block; 
+	margin: 0;c
 }
 #canvasTwo{
 	background-color:white;
@@ -24,9 +23,7 @@ body{
 </style>
 </head>
 <body>
-<div id="game">
     <canvas id = "canvasOne" width = "1000" height = "700"></canvas>
-</div>
 
 <script type="text/javascript" src="Events.js"></script>
 <script type="text/javascript" src ="Animation.js"></script>
@@ -1145,7 +1142,12 @@ body{
 		
 		
 		anim.setStage(function() {
-			//console.log("anim loop");
+			//change canvas dimensions according to user
+			var height = window.innerHeight;
+			var width = window.innerWidth;		
+			
+			canvas.style.width = width+'px';
+			canvas.style.height = height+'px';	
 			
 			this.clear();			
 			screens[currentScreen]();

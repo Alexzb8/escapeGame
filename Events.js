@@ -98,8 +98,8 @@ Events.prototype.getMousePos = function(evt){
 };
 
 Events.prototype.setMousePosition = function(evt){
-    var mouseX = evt.clientX - this.getCanvasPos().left + window.pageXOffset;
-    var mouseY = evt.clientY - this.getCanvasPos().top + window.pageYOffset;
+    var mouseX = evt.clientX *(1000/window.innerWidth) ;
+    var mouseY = evt.clientY *(700/window.innerHeight);
     this.mousePos = {
         x: mouseX,
         y: mouseY
