@@ -48,19 +48,21 @@ body{
 	   11: LAMP TOGGLE
      */
 	var debug = false;
-    var currentScreen = 1;
+    var currentScreen = 0;
     var timer = 0;
-	var totalResources = 48;
+	var totalResources = 50;
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
 	var images = {};
-	var hasBedroomKey = true; // until they get it from the portrait
+	var hasBedroomKey = false; // until they get it from the portrait
     var hasWeapon = false; // until they get the fire poker
     var hasStick = false; // until they get the stick from the lampshade
 	var portraitOpen = false;
 	var portraitOpening = false;//check if portrait is opening
 	var drawerOpen = false;
 	var drawerOpening = false;//check if drawer is opening
+	var xylophoneOpen = false;
+	var xylophoneOpening = false;
 	var bedroomOpen = false;
 	var bedroomOpening = false;//check if bedroom is opening
 	var bedroomOpening2 = false;//check if bedroom opening animation is at its second stage
@@ -72,7 +74,6 @@ body{
 	var puzx = [488, 541, 337, 337, 250, 445, 225, 393, 193];
 	var puzy = [495, 401, 306, 402, 255, 409, 443, 495, 345];
 	var puzzleLocation = "";
-	var solvedXylo = false;
 	var cursorX = -500;
     var cursorY = 0;
 	var currentnote = null;
@@ -96,7 +97,17 @@ body{
 	var death = AudioFX('audio/death',   { formats: ['wav'], pool: 100 });
 	//monster death sound
 	var monsterdeath = AudioFX('audio/monsterdeath',   { formats: ['wav'], pool: 100 });
+	//open shuffle sound
+	var openShuffle = AudioFX('audio/openshuffle',   { formats: ['wav'], pool: 100 });
+	//open door sound
+	var openDoor = AudioFX('audio/opendoor',   { formats: ['wav'], pool: 100 });
+	//close door sound
+	var closeDoor = AudioFX('audio/closedoor',   { formats: ['wav'], pool: 100 });
 	
+	
+	//xylophone stick coordinates
+		var stickX = -500;
+		var stickY = 0;
 	
 
     // xylophone notes
@@ -123,11 +134,16 @@ body{
 	//portrait code
 	var portraitCode = [4];
 	var portraitInput = [0,0,0,0];
+	var safeString = "";
 	
 	for(i=0;i<4;i++){	
-		portraitCode[i] = random(0,9);		
+		portraitCode[i] = random(0,9);
+		safeString = " " + safeString + portraitCode[i];
+		if(i!=3){
+			safeString = safeString + ",";
+		}
 	}
-	console.log(portraitCode);
+	console.log(safeString);
 
 	
 	// Returns a random integer between min (included) and max (included)
@@ -152,10 +168,16 @@ body{
 			
 			equal++;
 			if(equal==6){
-				//puzzle is solved			
-				solvedXylo = true;
+				//puzzle is solved
 				message.displayMess("You pressed the right keys Xp");
-				changeScreen(1);
+				//play xlophone opening sound
+				
+				xylophoneOpening = true;
+				setTimeout(function(){ 
+					xylophoneOpening = false;
+					xylophoneOpen = true;
+				}, 500);
+				safeOpen = false;
 				
 			}
 			
@@ -262,6 +284,8 @@ body{
 		loadImage("SCREENMONSTER");
 		loadImage("lamplightingafter");
         loadImage("lampwithoutstick");
+		loadImage("xylophonefull");
+		loadImage("xylophonehalf");
 		
 		//load puzzlepieces
 		for(i=0;i<9;i++){
@@ -306,12 +330,12 @@ body{
 			
 			events.beginRegion();
 			events.context.beginPath();
-			//events.context.fillStyle = "#00D2FF";
+			//events.context.fillStyle = "#00D2FF";// comment to avoid flicker
 			events.context.moveTo(x,y);
 			events.context.lineTo(x1,y1);
 			events.context.lineTo(x2,y2);
 			events.context.lineTo(x3,y3);
-			//events.context.fill();
+			//events.context.fill();       // comment to avoid flicker
 			events.context.closePath();	
 			events.addRegionEventListener("mousedown",function(){				
 				changeScreen(screen);
@@ -323,7 +347,24 @@ body{
 			events.closeRegion();
 		
 	}
-	function getItemEvent(x,y,width,height,item){
+	function xylophoneEventShape(x,y,x1,y1,x2,y2,x3,y3,screen){
+			
+			events.beginRegion();
+			events.context.beginPath();
+			//events.context.fillStyle = "#00D2FF";// comment to avoid flicker
+			events.context.moveTo(x,y);
+			events.context.lineTo(x1,y1);
+			events.context.lineTo(x2,y2);
+			events.context.lineTo(x3,y3);
+			//events.context.fill();       // comment to avoid flicker
+			events.context.closePath();	
+			events.addRegionEventListener("mousedown",function(){
+				changeScreen(screen);
+			});			
+			events.closeRegion();
+		
+	}
+	function getItemEvent(x,y,width,height,toDo){
 			
 			events.beginRegion();
 			events.context.beginPath();
@@ -331,145 +372,8 @@ body{
 			events.context.rect(x,y,width,height);
 			//events.context.fill();
 			events.context.closePath();	
-			events.addRegionEventListener("mousedown",function(){
-				if(item=="bedroomkey"){
-					hasBedroomKey = true;
-					message.displayMess("You found the bedroom key");
-					
-				}
-				else if(item=="poker"){
-					hasWeapon = true;
-					message.displayMess("You found a weapon!");
-					
-				}
-				else if(item=="openportrait"){
-					portraitOpen = !portraitOpen;
-					portraitOpening = true;
-					setTimeout(function(){ portraitOpening = false; }, 500);
-					safeOpen = false;
-				}
-				else if(item=="opendrawer"){
-					drawerOpening = true;
-					drawerOpen = !drawerOpen;
-					setTimeout(function(){ drawerOpening = false; }, 500);
-				}
-				else if(item=="toggledoor"){
-				
-					if(hasBedroomKey){
-						
-						//animate bedroom door
-						if(bedroomOpen){
-							//animate bedroom closing
-							bedroomOpening2 = true;							
-							
-							setTimeout(function(){
-								bedroomOpening = true; 
-								bedroomOpening2 = false;					
-								
-								setTimeout(function(){
-									bedroomOpening = false;
-									bedroomOpen = false;
-								}, 500);								
-							}, 500);
-						}
-						else{
-							//animate bedroom opening							
-							message.displayMess("You used the bedroom key");
-							bedroomOpening = true;
-							bedroomOpen = !bedroomOpen;
-							
-							
-							setTimeout(function(){
-								bedroomOpening = false; 
-								bedroomOpening2 = true;					
-								
-								setTimeout(function(){
-									bedroomOpening2 = false;
-									bedroomOpen = true;
-									
-									if(monsterAlive){
-										if(hasWeapon){
-											message.displayMess("Used weapon on monster");
-											//play monster dying sound
-											monsterdeath.play();
-											//kill monster
-											setTimeout(function(){
-												monsterAlive = false;												
-											}, 1500);	
-											
-										}
-										else{
-											//play dying sound
-											death.play();
-											//change screen
-											setTimeout(function(){
-												changeScreen(9);												
-											}, 1500);											
-										}
-									}
-									
-								}, 500);								
-							}, 500);
-						
-						}
-					}
-					else{
-						message.displayMess("You dont have the key");
-					}
-					
-					
-					
-				}
-				else if(item=="enter"){
-					//check if code is correct
-					var equal = 0;
-					for(i=0;i<4;i++){
-					
-						if(portraitInput[i]==portraitCode[i]){
-							equal++;
-						}
-					
-					}
-					
-					if(equal==4){
-						//pasword correct	
-						bing.play();
-						safeOpen = true;
-						message.displayMess("Password is correct");
-						
-					}
-					else{
-						//play error sound
-						bing.play();
-					}
-				
-				}
-				else if(item=="0up"){
-					newInputPortrait(true,0);
-				}
-				else if(item=="1up"){
-					newInputPortrait(true,1);
-				}
-				else if(item=="2up"){
-					newInputPortrait(true,2);
-				}
-				else if(item=="3up"){
-					newInputPortrait(true,3);
-				}
-				else if(item=="0down"){
-					newInputPortrait(false,0);
-				}
-				else if(item=="1down"){
-					newInputPortrait(false,1);
-				}
-				else if(item=="2down"){
-					newInputPortrait(false,2);
-				}
-				else if(item=="3down"){
-					newInputPortrait(false,3);
-				}
-				
-				
+			events.addRegionEventListener("mousedown",function(){			
+				toDo();				
 			});
 			events.addRegionEventListener("mousemove", function () {
 					document.body.style.cursor = "pointer";
@@ -516,8 +420,72 @@ body{
 		}
 	
 	}
-	function checkregion(mouse){
-
+	function toggledoor(){
+		if(hasBedroomKey){
+	
+			//animate bedroom door
+			if(bedroomOpen){
+				//animate bedroom closing
+				bedroomOpening2 = true;							
+				
+				setTimeout(function(){
+					bedroomOpening = true; 
+					bedroomOpening2 = false;					
+					
+					setTimeout(function(){
+						closeDoor.play();
+						bedroomOpening = false;
+						bedroomOpen = false;
+					}, 500);								
+				}, 500);
+			}
+			else{
+				//animate bedroom opening							
+				message.displayMess("You used the bedroom key");
+				bedroomOpening = true;
+				bedroomOpen = !bedroomOpen;
+				
+				
+				setTimeout(function(){
+					bedroomOpening = false; 
+					bedroomOpening2 = true;	
+					openDoor.play();
+					
+					setTimeout(function(){
+						bedroomOpening2 = false;
+						bedroomOpen = true;
+						
+						
+						if(monsterAlive){
+							if(hasWeapon){
+								message.displayMess("Used weapon on monster");
+								//play monster dying sound
+								monsterdeath.play();
+								//kill monster
+								setTimeout(function(){
+									monsterAlive = false;												
+								}, 1500);	
+								
+							}
+							else{
+								//play dying sound
+								death.play();
+								//change screen
+								setTimeout(function(){
+									changeScreen(9);												
+								}, 1500);											
+							}
+						}
+						
+					}, 500);								
+				}, 500);
+			
+			}
+		}
+		else{
+			message.displayMess("You dont have the key");
+		}
+						
 	}
 	function drawStick(cursorX,cursorY) {
 			
@@ -576,7 +544,7 @@ body{
 		//update and check note input array
       	newNote(this.noteNum);        
     };
-    Note.prototype.keyDidPlay = function(stickX, stickY) {
+    Note.prototype.keyDidPlay = function() {
         if (stickX >= this.topLeftX && stickX <= this.topRightX
             && stickY >= this.topLeftY && stickY <= this.bottomLeftY) {
             return true;
@@ -639,9 +607,7 @@ body{
 		var piecewidth = 69;
 		var context = events.context;
 		var pixlet = 10;//how many pixels we can be not correctly placed	
-		//xylophone stick coordinates
-		var stickX = -500;
-		var stickY = 0;
+		
 		
 		screens = [
 			//main menu draw
@@ -744,7 +710,22 @@ body{
 			},
 			//xylophone draw
 			function(){
-				events.context.drawImage(images["xylophone"], 0, 0, events.canvas.width, events.canvas.height);
+				if (xylophoneOpening){
+					events.context.drawImage(images["xylophonehalf"], 0, 0, events.canvas.width, events.canvas.height);
+				}
+				else{
+					if(xylophoneOpen){
+						events.context.drawImage(images["xylophonefull"], 0, 0, events.canvas.width, events.canvas.height);
+						events.context.font = "60px Arial";
+						events.context.fillStyle = "#000000";
+						events.context.fillText(safeString, 300, 250);
+					}
+					else{
+						events.context.drawImage(images["xylophone"], 0, 0, events.canvas.width, events.canvas.height);
+					}
+				
+				}
+				
 				
 				var i ;
 				
@@ -810,15 +791,16 @@ body{
 				createEventBox(510, 150, 130, 20, 4);
 				createEventBox(0,0,100,50,0);
 				createEventShape(880,0,1000,0,1000,360,880,260,6);
-				if(!solvedXylo){
-					createEventShape(7,520,229,385,265,416,77,590,5);
-				}
+				createEventShape(7,520,229,385,265,416,77,590,5);
 				createEventShape(400,24,430,24,448,90,387,90,11);
 				if(!puzzleComplete){
 					createEventBox(400,380,220,120,2);
 				}
 				if(!hasWeapon){
-					getItemEvent( 350, 170, 30, 120,"poker");
+					getItemEvent( 350, 170, 30, 120,function(){
+						hasWeapon = true;
+						message.displayMess("You found a weapon!");
+					});
 				}
 			},
 			//puzzle events
@@ -898,43 +880,106 @@ body{
 			//portrait events
 			function(){
 				if(safeOpen){
-					getItemEvent(0,0,480,700,"openportrait");
+					getItemEvent(0,0,480,700,function(){
+						openShuffle.play();
+						portraitOpen = !portraitOpen;
+						portraitOpening = true;
+						setTimeout(function(){ portraitOpening = false; }, 500);
+						safeOpen = false;
+					});
 					if(!hasBedroomKey){
-						getItemEvent(650, 220, 200, 200,"bedroomkey");
+					
+						getItemEvent(650, 220, 200, 200,function(){
+							hasBedroomKey = true;
+							message.displayMess("You found the bedroom key");
+						});
 					}
 				}
 				else if(portraitOpen){
-					getItemEvent(0,0,480,700,"openportrait");
-					getItemEvent(760,445,200,70,"enter");
+					getItemEvent(0,0,480,700,function(){
+						openShuffle.play();
+						portraitOpen = !portraitOpen;
+						portraitOpening = true;
+						setTimeout(function(){ portraitOpening = false; }, 500);
+						safeOpen = false;
+					});
+					getItemEvent(760,445,200,70,function(){
+						//check if code is correct
+						var equal = 0;
+						for(i=0;i<4;i++){
+						
+							if(portraitInput[i]==portraitCode[i]){
+								equal++;
+							}
+						
+						}
+						
+						if(equal==4){
+							//pasword correct	
+							bing.play();
+							safeOpen = true;
+							message.displayMess("Password is correct");
+							
+						}
+						else{
+							//play error sound
+							bing.play();
+						}
+					});
 					//button events
-					getItemEvent(560,170,70,70,"0up");
-					getItemEvent(660,170,70,70,"1up");
-					getItemEvent(760,170,70,70,"2up");
-					getItemEvent(860,170,70,70,"3up");
-					getItemEvent(560,355,70,70,"0down");
-					getItemEvent(660,355,70,70,"1down");
-					getItemEvent(760,355,70,70,"2down");
-					getItemEvent(860,355,70,70,"3down");
+					getItemEvent(560,170,70,70,function(){newInputPortrait(true,0);});
+					getItemEvent(660,170,70,70,function(){newInputPortrait(true,1);});
+					getItemEvent(760,170,70,70,function(){newInputPortrait(true,2);});
+					getItemEvent(860,170,70,70,function(){newInputPortrait(true,3);});
+					getItemEvent(560,355,70,70,function(){newInputPortrait(false,0);});
+					getItemEvent(660,355,70,70,function(){newInputPortrait(false,1);});
+					getItemEvent(760,355,70,70,function(){newInputPortrait(false,2);});
+					getItemEvent(860,355,70,70,function(){newInputPortrait(false,3);});
 				}
 				else{
 					createEventBox(0,0,480,700,1);
 					//to open portrait
-					getItemEvent(490,60,500,550,"openportrait");
+					getItemEvent(490,60,500,550,function(){
+						openShuffle.play();
+						portraitOpen = !portraitOpen;
+						portraitOpening = true;
+						setTimeout(function(){ portraitOpening = false; }, 500);
+						safeOpen = false;
+					});
 					
 				}
 			},
 			//drawer events
 			function(){
 				if(!drawerOpening){
-					if (!drawerOpen) {				
-						createEventBox(0,0,100,50,1); // BACK BUTTON
-						if (hasDrawerKey) {
-							getItemEvent(240, 370, 520, 100, "opendrawer");
-						}
+					createEventBox(0,0,1000,100,1); // BACK BUTTON
+					if (!drawerOpen) {
+						//draw event shape on the location for the drawer closed
+						getItemEvent(240, 370, 520, 100, function(){
+							if(hasDrawerKey){
+								openShuffle.play();
+								drawerOpening = true;
+								drawerOpen = !drawerOpen;
+								setTimeout(function(){ drawerOpening = false; }, 500);
+							}
+							else{
+								message.displayMess("You dont have the key");
+							}
+						});						
 					}
 					else {
-							createEventBox(0,0,100,50,1); // BACK BUTTON
-							getItemEvent(110, 600, 780, 95, "opendrawer");
+						//draw event on location for drawer open
+						getItemEvent(110, 600, 780, 95, function(){
+							if(hasDrawerKey){
+								openShuffle.play();
+								drawerOpening = true;
+								drawerOpen = !drawerOpen;
+								setTimeout(function(){ drawerOpening = false; }, 500);
+							}
+							else{
+								message.displayMess("You dont have the key");
+							}
+						});
 							
 						
 					}
@@ -942,12 +987,30 @@ body{
 			
 			},
 			//xylophone events
-			function(){
-			
-				var mousePos = events.getMousePos();
-				stickX = mousePos.x ;
-				stickY = mousePos.y ;
-				createEventBox(0,0,1000,320,1);				
+			function(){			
+				
+				if(xylophoneOpen){
+					xylophoneEventShape(0,0,1000,0,1000,150,0,75,1);	
+				}
+				else{
+					xylophoneEventShape(0,0,1000,0,1000,320,0,320,1);	
+				}
+				//get xylophone coordinates	
+				
+				events.beginRegion();
+				events.context.beginPath();
+				//events.context.fillStyle = "#00D2FF";
+				events.context.rect(3,3,994,694);
+				events.context.closePath();		
+				//events.context.fill();
+				events.addRegionEventListener("mousemove",function(){
+					var posi = events.getMousePos();
+					stickX = posi.x ;
+					stickY = posi.y ;
+				});
+				events.closeRegion();
+				
+				
 				
 				events.beginRegion();
 				events.context.beginPath();
@@ -960,7 +1023,7 @@ body{
 				//events.context.stroke();
 				events.addRegionEventListener("mousedown",function(){
 					for (var i = 0; i < 7; i++) {
-						if (noteRow[i].keyDidPlay(stickX, stickY)) {
+						if (noteRow[i].keyDidPlay()) {
 							noteRow[i].playSelf();
 							currentnote = i;
 						}
@@ -983,17 +1046,19 @@ body{
 					createEventBox(0,550,1000,150,6);
 					if(bedroomOpen){
 						//change coordinates to correct door location
-						getItemEvent(670, 10, 310, 530,"toggledoor");
+						getItemEvent(670, 10, 310, 530,function(){toggledoor();});
 					}
 					else{						
 												
-						getItemEvent(345, 10, 310, 530,"toggledoor");
+						getItemEvent(345, 10, 310, 530,function(){toggledoor();});
 					}
 				}
 			},
 			function(){
 			},
+			//death by monster screen, events
 			function(){
+				//code to restart the game
 			},
 			function(){
 			}
@@ -1016,16 +1081,18 @@ body{
 		});
 		
 		events.setStage(function () {
+			
 			document.body.style.cursor = "default";
 			drawEvents[currentScreen]();			
 		});
 		
 		
 		anim.setStage(function() {
-			console.log("anim loop");
+			//console.log("anim loop");
 			
 			this.clear();			
 			screens[currentScreen]();
+			//drawEvents[currentScreen]();	//for debug
 			
 			if(toolbox && currentScreen != 0){
 				//draw toolbox
