@@ -43,7 +43,7 @@ body{
      * 9: death by monster screen
      * 10: death by timer screen
      */
-	var debug = false;
+	var maxMinutes = 10;
     var currentScreen = 1;
 	var totalResources = 52;
 	var numResourcesLoaded = 0;
@@ -69,13 +69,7 @@ body{
 	var puzzleComplete = false;
 	var puzx = [488, 541, 337, 337, 250, 445, 225, 393, 193];
 	var puzy = [495, 401, 306, 402, 255, 409, 443, 495, 345];
-	var puzzleLocation = "";
-	var cursorX = -500;
-    var cursorY = 0;
-	var currentnote = null;
 	var fireCount = 1;
-	//define global loop for later use
-	var intervalLoop;
 	//global events
 	var events;
 	//array to hold the different screens
@@ -548,8 +542,8 @@ body{
 				if(this.seconds==60){
 					this.seconds = 0;
 					this.minutes++;
-					if(this.minutes == 60){
-						this.minutes = 0;
+					if(this.minutes >= maxMinutes){
+						changeScreen(10);
 					}
 				}	
 			}
@@ -579,7 +573,62 @@ body{
 			this.drawMinutes(x,y);
 		};
 	}
+	function restartGame(){
+		//restart timer
+		timer.minutes = 0;
+		timer.seconds = 0;
 	
+		currentScreen = 1;
+		hasBedroomKey = false; // until they get it from the portrait
+		hasWeapon = false; // until they get the fire poker
+		hasStick = false; // until they get the stick from the lampshade
+		hasDrawerKey = false;
+		hasMainKey = false; //key to front door
+		portraitOpen = false;
+		portraitOpening = false;//check if portrait is opening
+		drawerOpen = false;
+		drawerOpening = false;//check if drawer is opening
+		xylophoneOpen = false;
+		xylophoneOpening = false;
+		bedroomOpen = false;
+		bedroomOpening = false;//check if bedroom is opening
+		bedroomOpening2 = false;//check if bedroom opening animation is at its second stage
+		monsterAlive = true;
+		safeOpen = false; //check if safe is open
+		lampOn = true;
+		puzzleComplete = false;
+		puzx = [488, 541, 337, 337, 250, 445, 225, 393, 193];
+		puzy = [495, 401, 306, 402, 255, 409, 443, 495, 345];
+		fireCount = 1;
+		toolbox = false; //condition to draw toolbox
+		stickX = -500;
+		stickY = 0;			
+		//drawer key coordinates
+		puzzleKeyY = 290;
+		puzzleKeyX = 500;
+		noteString = "";	
+		for(i = 0 ; i<numNotes;i++){
+			xylophoneAnswer[i] = random(0,6);
+			
+			if(i==0){
+				noteString = noteString +  noteLetters[xylophoneAnswer[i]];
+			}
+			else{
+				noteString = noteString +", " +  noteLetters[xylophoneAnswer[i]];
+			}
+		}
+		portraitInput = [0,0,0,0];
+		safeString = "";
+		
+		for(i=0;i<4;i++){
+			portraitCode[i] = random(0,9);
+			safeString = " " + safeString + portraitCode[i];
+			if(i!=3){
+				safeString = safeString + ",";
+			}
+		}
+		
+	}
 	// defining each note on the xylophone
     function Note(num, note, topLeftX, topLeftY, topRightX, bottomLeftY, context) {
         this.ctx = context;
@@ -876,13 +925,28 @@ body{
 				}
 				
 			},
+			//win screen draw
 			function(){
+				events.context.drawImage(images["SCREENWIN"], 0, 0, events.canvas.width, events.canvas.height);
+				//draw time
+				var text = timer.minutes + " : " + timer.seconds;
+				
+				events.context.save();
+				events.context.font = '60pt Georgia';
+				events.context.lineWidth = 3;
+				events.context.strokeStyle = "black";
+				events.context.fillStyle= "white";
+				events.context.fillText(": " + text, 400,500);
+				events.context.strokeText(": " + text, 400,500);				
+				events.context.restore();
 			},
 			//death by monster draw
 			function(){			
 				events.context.drawImage(images["SCREENMONSTER"], 0, 0, events.canvas.width, events.canvas.height);
 			},
+			//death by timer
 			function(){
+				events.context.drawImage(images["SCREENGAMEOVER"], 0, 0, events.canvas.width, events.canvas.height);
 			}
 		];
 		
@@ -1175,7 +1239,6 @@ body{
 						for (var i = 0; i < 7; i++) {
 							if (noteRow[i].keyDidPlay()) {
 								noteRow[i].playSelf();
-								currentnote = i;
 							}
 						}
 					}
@@ -1222,13 +1285,21 @@ body{
 					}
 				}
 			},
+			//win events
 			function(){
+				
 			},
 			//death by monster screen, events
 			function(){
-				//code to restart the game
+				getItemEvent(270,430,460,222,function(){
+					restartGame();
+				});
 			},
+			//death by timer events
 			function(){
+				getItemEvent(270,430,460,222,function(){
+					restartGame();
+				});
 			}
 		];
 	
@@ -1317,6 +1388,7 @@ body{
 			message.drawMessage();
 			
 			//timer
+			if(currentScreen>0 && currentScreen<8)
 			timer.drawTime(900,680);
 		
 		});
