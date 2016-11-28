@@ -1175,9 +1175,12 @@ body{
 				if(hasWeapon){
 					events.context.drawImage(images["poker"], 30, 100, 50, 50);
 				}
-				if(hasDrawerKey){	
-					//using text of key 2 somehow glitches
+				if(hasDrawerKey){
 					events.context.drawImage(images["keyfrompuzzle"], 20, 160, 50, 50);
+				}
+				if(hasMainKey){	
+					//using text of key 2 somehow glitches
+					events.context.drawImage(images["redkey"], 20, 220, 50, 50);
 				}
 			}
 			
