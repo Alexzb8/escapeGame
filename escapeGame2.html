@@ -43,7 +43,7 @@ body{
      * 9: death by monster screen
      * 10: death by timer screen
      */
-	var maxMinutes = 10;
+	var maxMinutes = 5;
     var currentScreen = 0;
 	var totalResources = 52;
 	var numResourcesLoaded = 0;
@@ -98,6 +98,8 @@ body{
 	var openDoor = AudioFX('audio/opendoor',   { formats: ['wav'], pool: 100 });
 	//close door sound
 	var closeDoor = AudioFX('audio/closedoor',   { formats: ['wav'], pool: 100 });
+	//lamp switch sound
+	var lampSwitch = AudioFX('audio/switch',   { formats: ['wav'], pool: 100 });
 	
 	
 	//xylophone stick coordinates
@@ -981,9 +983,13 @@ body{
 							lampOn = !lampOn;
 						});
 						lampOn = !lampOn;
+						if(!hasStick){
+							lampSwitch.play();
+						}
 					}
 					else {
 						lampOn = !lampOn;
+						lampSwitch.play();
 					}
 					
 				});		
