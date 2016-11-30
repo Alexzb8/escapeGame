@@ -70,6 +70,7 @@ body{
 	var puzx = [488, 541, 337, 337, 250, 445, 225, 393, 193];
 	var puzy = [495, 401, 306, 402, 255, 409, 443, 495, 345];
 	var fireCount = 1;
+	var dragging = null;
 	//global events
 	var events;
 	//array to hold the different screens
@@ -335,7 +336,7 @@ body{
 			//events.context.fill();       // comment to avoid flicker
 			events.context.closePath();	
 			events.addRegionEventListener("mousedown",function(){
-				
+				dragging = null;
 				changeScreen(screen);
 			});
 			events.addRegionEventListener("mousemove", function () {
@@ -374,7 +375,29 @@ body{
 			//events.context.stroke();
 			events.context.closePath();	
 			events.addRegionEventListener("mousedown",function(){			
-				toDo();				
+				toDo();		
+				dragging = null;
+			});
+			events.addRegionEventListener("mousemove", function () {
+					document.body.style.cursor = "pointer";
+			});
+			
+			events.closeRegion();
+		
+	}
+	function dragEvent(x,y,width,height,toDo){
+			
+			events.beginRegion();
+			events.context.beginPath();
+			//events.context.fillStyle = "#00D2FF";
+			//events.context.strokeStyle="#000000";
+			//events.context.lineWidth=5;
+			events.context.rect(x,y,width,height);
+			//events.context.fill();
+			//events.context.stroke();
+			events.context.closePath();	
+			events.addRegionEventListener("mousedown",function(){			
+				toDo();
 			});
 			events.addRegionEventListener("mousemove", function () {
 					document.body.style.cursor = "pointer";
@@ -441,50 +464,61 @@ body{
 				}, 500);
 			}
 			else{
-				//animate bedroom opening							
-				message.displayMess("You used the bedroom key");
-				bedroomOpening = true;
-				bedroomOpen = !bedroomOpen;
-				
-				
-				setTimeout(function(){
-					bedroomOpening = false; 
-					bedroomOpening2 = true;	
-					openDoor.play();
+			
+				if(dragging =="bedroomkey"){
+					dragging = null;
+					//animate bedroom opening
+					bedroomOpening = true;
+					bedroomOpen = !bedroomOpen;
+					
 					
 					setTimeout(function(){
-						bedroomOpening2 = false;
-						bedroomOpen = true;
+						bedroomOpening = false; 
+						bedroomOpening2 = true;	
+						openDoor.play();
 						
-						
-						if(monsterAlive){
-							if(hasWeapon){
-								message.displayMess("Used weapon on monster");
-								//play monster dying sound
-								monsterdeath.play();
-								//kill monster
-								setTimeout(function(){
-									monsterAlive = false;												
-								}, 1500);	
-								
+						setTimeout(function(){
+							bedroomOpening2 = false;
+							bedroomOpen = true;
+							
+							
+							if(monsterAlive){
+								if(hasWeapon){
+									message.displayMess("Used weapon on monster");
+									//play monster dying sound
+									monsterdeath.play();
+									//kill monster
+									setTimeout(function(){
+										monsterAlive = false;												
+									}, 1500);	
+									
+								}
+								else{
+									//play dying sound
+									death.play();
+									//change screen
+									setTimeout(function(){
+										changeScreen(9);												
+									}, 1500);											
+								}
 							}
-							else{
-								//play dying sound
-								death.play();
-								//change screen
-								setTimeout(function(){
-									changeScreen(9);												
-								}, 1500);											
-							}
-						}
-						
-					}, 500);								
-				}, 500);
+							
+						}, 500);								
+					}, 500);
+				
+				
+				}
+				else{
+					message.displayMess("You need a key");
+				}
+				
+				
+				
 			
 			}
 		}
 		else{
-			message.displayMess("You dont have the key");
+			message.displayMess("You need a key");
 		}
 						
 	}
@@ -580,7 +614,7 @@ body{
 		//restart timer
 		timer.minutes = 0;
 		timer.seconds = 0;
-	
+		dragging = null;
 		currentScreen = 1;
 		hasBedroomKey = false; // until they get it from the portrait
 		hasWeapon = false; // until they get the fire poker
@@ -1174,29 +1208,26 @@ body{
 					if (!drawerOpen) {
 						//draw event shape on the location for the drawer closed
 						getItemEvent(240, 370, 520, 100, function(){
-							if(hasDrawerKey){
+							if(dragging=="drawerkey"){
+								dragging  = null;
 								openShuffle.play();
 								drawerOpening = true;
 								drawerOpen = !drawerOpen;
 								setTimeout(function(){ drawerOpening = false; }, 500);
 							}
 							else{
-								message.displayMess("You dont have the key");
+								message.displayMess("You need a key");
 							}
 						});						
 					}
 					else {
 						//draw event on location for drawer open
 						getItemEvent(110, 600, 780, 95, function(){
-							if(hasDrawerKey){
 								openShuffle.play();
 								drawerOpening = true;
 								drawerOpen = !drawerOpen;
 								setTimeout(function(){ drawerOpening = false; }, 500);
-							}
-							else{
-								message.displayMess("You dont have the key");
-							}
+							
 						});
 							
 						
@@ -1320,6 +1351,15 @@ body{
 		var context = anim.getContext();
 		
 		
+		//mouse coordinates when dragging		
+		var mouseC = {x:0,y:0}
+		
+		//coordinates for items
+		var bedroomKCoor = {x:20,y:40};
+		var drawerKCoor = {x:20,y:160};
+		var mainKCoor = {x:20,y:220};
+		
+		
 		
 		createScreens(); //create function arrays to handle drawing and events
 		
@@ -1327,9 +1367,33 @@ body{
 			toolbox = !toolbox;
 		});
 		
-		events.setStage(function () {			
+		events.setStage(function () {
 			document.body.style.cursor = "default";
-			drawEvents[currentScreen]();			
+			drawEvents[currentScreen]();	
+			if(toolbox && currentScreen > 0 && currentScreen < 8){
+				
+				if(hasBedroomKey){
+					dragEvent(20, 40, 50, 50,function(){
+						dragging = "bedroomkey";
+					});
+				}
+				if(hasDrawerKey){
+					dragEvent(20, 160, 50, 50,function(){
+						dragging = "drawerkey";
+					});
+				}
+				if(hasMainKey){
+					dragEvent(20, 220, 50, 50,function(){
+						dragging = "mainkey";
+					});
+				}
+				
+			}
+			if(dragging){
+					mouseC.x = window.event.clientX *(1000/window.innerWidth) ;
+					mouseC.y = window.event.clientY *(700/window.innerHeight) ;
+			}
+			
 		});
 		
 		
@@ -1362,16 +1426,35 @@ body{
 				
 				
 				if(hasBedroomKey){
-					events.context.drawImage(images["key2"], 20, 40, 50, 50);
+					if(dragging=="bedroomkey"){
+						events.context.drawImage(images["key2"], mouseC.x, mouseC.y, 50, 50);
+					}
+					else{
+						events.context.drawImage(images["key2"], bedroomKCoor.x, bedroomKCoor.y, 50, 50);
+					}
+					
+					
 				}
 				if(hasWeapon){
 					events.context.drawImage(images["poker"], 30, 100, 50, 50);
 				}
 				if(hasDrawerKey){
-					events.context.drawImage(images["keyfrompuzzle"], 20, 160, 50, 50);
+					
+					if(dragging=="drawerkey"){
+						events.context.drawImage(images["keyfrompuzzle"], mouseC.x, mouseC.y, 50, 50);
+					}
+					else{
+						events.context.drawImage(images["keyfrompuzzle"], drawerKCoor.x, drawerKCoor.y, 50, 50);
+					}
 				}
 				if(hasMainKey){
-					events.context.drawImage(images["redkey"], 20, 220, 50, 50);
+					
+					if(dragging=="mainkey"){
+						events.context.drawImage(images["redkey"], mouseC.x, mouseC.y, 50, 50);
+					}
+					else{
+						events.context.drawImage(images["redkey"], mainKCoor.x, mainKCoor.y, 50, 50);
+					}
 				}
 				if(hasStick){
 					events.context.beginPath();
