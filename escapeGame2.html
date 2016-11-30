@@ -44,7 +44,7 @@ body{
      * 10: death by timer screen
      */
 	var maxMinutes = 10;
-    var currentScreen = 1;
+    var currentScreen = 0;
 	var totalResources = 52;
 	var numResourcesLoaded = 0;
 	var finishedLoading = false;
@@ -565,6 +565,7 @@ body{
 			events.context.fillText(": " + text, x,y);
 			events.context.strokeText(": " + text, x,y);				
 			events.context.restore();
+				
 		};
 		
 		this.drawTime = function(x,y){
@@ -732,7 +733,7 @@ body{
 		var draggingRectOffsetY = [0,0,0,0,0,0,0,0,0];
 		var piecewidth = 69;
 		var context = events.context;
-		var pixlet = 10;//how many pixels we can be not correctly placed	
+		var pixlet = 10;         //how many pixels we can be not correctly placed	
 		
 		
 		screens = [
@@ -1279,7 +1280,7 @@ body{
 							});
 						}
 					}
-					else{						
+					else{
 												
 						getItemEvent(345, 10, 310, 530,function(){toggledoor();});
 					}
@@ -1338,7 +1339,7 @@ body{
 			screens[currentScreen]();
 			//drawEvents[currentScreen]();	//for debug
 			
-			if(toolbox && currentScreen != 0){
+			if(toolbox && currentScreen > 0 && currentScreen < 8){
 				//draw toolbox
 				events.context.beginPath();
 				events.context.rect(0, 0, 100, 400);
@@ -1388,12 +1389,13 @@ body{
 			message.drawMessage();
 			
 			//timer
-			if(currentScreen>0 && currentScreen<8)
-			timer.drawTime(900,680);
+			if(currentScreen>0 && currentScreen<8){
+				timer.drawTime(900,680);
+			}
+			
 		
 		});
-		anim.start();
-	
+		anim.start();	
 	}
 
     window.onload = function() {
