@@ -390,11 +390,8 @@ body{
 			events.beginRegion();
 			events.context.beginPath();
 			//events.context.fillStyle = "#00D2FF";
-			//events.context.strokeStyle="#000000";
-			//events.context.lineWidth=5;
 			events.context.rect(x,y,width,height);
 			//events.context.fill();
-			//events.context.stroke();
 			events.context.closePath();	
 			events.addRegionEventListener("mousedown",function(){			
 				toDo();
@@ -608,6 +605,28 @@ body{
 			this.moreTime();
 			this.drawSeconds(x+this.separation,y);
 			this.drawMinutes(x,y);
+		};
+		this.getTimeString = function(x,y){		
+			var secs = "";
+			if (this.seconds<10){
+				secs = "0"+this.seconds;
+			}
+			else{
+				secs = this.seconds;
+			}		
+		
+			var mins = "";
+			
+			if (this.minutes<10){
+				mins = "0"+this.minutes;
+			}
+			else{
+				mins = this.minutes;
+			}
+			
+			return mins+" : "+secs;
+			
+			
 		};
 	}
 	function restartGame(){
@@ -966,15 +985,15 @@ body{
 			function(){
 				events.context.drawImage(images["SCREENWIN"], 0, 0, events.canvas.width, events.canvas.height);
 				//draw time
-				var text = timer.minutes + " : " + timer.seconds;
+				var text = timer.getTimeString();
 				
 				events.context.save();
 				events.context.font = '60pt Georgia';
 				events.context.lineWidth = 3;
 				events.context.strokeStyle = "black";
 				events.context.fillStyle= "white";
-				events.context.fillText(": " + text, 400,500);
-				events.context.strokeText(": " + text, 400,500);				
+				events.context.fillText(text, 400,500);
+				events.context.strokeText(text, 400,500);				
 				events.context.restore();
 			},
 			//death by monster draw
@@ -1001,7 +1020,18 @@ body{
 				createEventShape(7,520,229,385,265,416,77,590,5);
 				createEventBox(400,380,220,120,2);
 				
+				dragEvent(683,10,136,222,function(){
 				
+					if(dragging=="mainkey"){
+						openDoor.play();
+						dragging=null;
+						currentScreen = 8;						
+					}
+					else{
+						message.displayMess("You need a key");
+					}
+				
+				});
 				
 				getItemEvent(387,24,61,66,function(){
 					
