@@ -574,11 +574,11 @@ body{
 				this.seconds--;
 				if(this.seconds<0){
 					this.seconds = 59;
-					this.minutes--;
-					if(this.minutes == 0 && this.seconds==0){
-						changeScreen(10);
-					}
-				}	
+					this.minutes--;					
+				}
+				if(this.minutes == 0 && this.seconds==0){
+					changeScreen(10);
+				}
 			}
 		
 		
