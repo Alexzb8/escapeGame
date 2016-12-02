@@ -536,7 +536,7 @@ body{
 		events.context.closePath();
 	}
     function Timer(){
-		this.minutes = 0;
+		this.minutes = maxMinutes;
 		this.seconds = 0;
 		this.m = Date.now();
 		this.s = Date.now();
@@ -571,11 +571,11 @@ body{
 		
 			if(this.s+1000 <= this.time){
 				this.s = Date.now();
-				this.seconds++;
-				if(this.seconds==60){
-					this.seconds = 0;
-					this.minutes++;
-					if(this.minutes >= maxMinutes){
+				this.seconds--;
+				if(this.seconds<0){
+					this.seconds = 59;
+					this.minutes--;
+					if(this.minutes == 0 && this.seconds==0){
 						changeScreen(10);
 					}
 				}	
