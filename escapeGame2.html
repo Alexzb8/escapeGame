@@ -100,6 +100,10 @@ body{
 	var closeDoor = AudioFX('audio/closedoor',   { formats: ['wav'], pool: 100 });
 	//lamp switch sound
 	var lampSwitch = AudioFX('audio/switch',   { formats: ['wav'], pool: 100 });
+    // wrong passcode sound
+    var wrongPass = AudioFX('audio/errorSound', {formats: ['m4a'], pool: 100});
+    // locked door sound
+    var lockedSound = AudioFX('audio/stillLockedSound', {formats: ['m4a'], pool: 100});
 
 
 	//xylophone stick coordinates
@@ -170,7 +174,7 @@ body{
 			equal++;
 			if(equal==6){
 				//puzzle is solved
-				message.displayMess("You pressed the right keys Xp");
+				message.displayMess("You pressed the right keys!");
 				//play xlophone opening sound
 				openShuffle.play();
 				xylophoneOpening = true;
@@ -246,9 +250,9 @@ body{
 		loadImage("SCREENWIN");
 		loadImage("opendoor");
 		loadImage("monster");
-		loadImage("livingroom");
+		loadImage("final");
 		loadImage("hallway");
-		loadImage("closeddoor");
+		loadImage("deathdoor");
 		loadImage("fire1");
 		loadImage("fire2");
 		loadImage("fire3");
@@ -278,8 +282,8 @@ body{
 		loadImage("monster");
 		loadImage("opendoor");
 		loadImage("SCREENMONSTER");
-		loadImage("lamplightingafter");
-        loadImage("lampwithoutstick");
+		loadImage("inthedark2up");
+        loadImage("inthedarkup");
 		loadImage("xylophonefull");
 		loadImage("xylophonehalf");
 		loadImage("redkey");
@@ -327,12 +331,12 @@ body{
 
 			events.beginRegion();
 			events.context.beginPath();
-			events.context.fillStyle = "#00D2FF";// comment to avoid flicker
+//			events.context.fillStyle = "#00D2FF";// comment to avoid flicker
 			events.context.moveTo(x,y);
 			events.context.lineTo(x1,y1);
 			events.context.lineTo(x2,y2);
 			events.context.lineTo(x3,y3);
-			events.context.fill();       // comment to avoid flicker
+//			events.context.fill();       // comment to avoid flicker
 			events.context.closePath();
 			events.addRegionEventListener("mousedown",function(){
 				dragging = null;
@@ -345,36 +349,40 @@ body{
 			events.closeRegion();
 
 	}
-	function xylophoneEventShape(x,y,x1,y1,x2,y2,x3,y3,screen){
 
-			events.beginRegion();
-			events.context.beginPath();
-			//events.context.fillStyle = "#00D2FF";// comment to avoid flicker
-			events.context.moveTo(x,y);
-			events.context.lineTo(x1,y1);
-			events.context.lineTo(x2,y2);
-			events.context.lineTo(x3,y3);
-			//events.context.fill();       // comment to avoid flicker
-			events.context.closePath();
-			events.addRegionEventListener("mousedown",function(){
-				changeScreen(screen);
-			});
-			events.closeRegion();
+	// transition arrows to get out of close up views of objects
+	function eventArrow(x, y, screen) {
+        events.context.fillStyle = "#00D2FF";
+        events.beginRegion();
+        events.context.beginPath();
+        events.context.moveTo(x, y);
+        events.context.lineTo(x + 40, y);
+        events.context.lineTo(x + 40, y + 13);
+        events.context.lineTo(x + 58, y - 8);
+        events.context.lineTo(x + 40, y - 25);
+        events.context.lineTo(x + 40, y - 13);
+        events.context.lineTo(x, y - 13);
+        events.context.lineTo(x, y);
+        events.context.fill();
+        events.context.closePath();
+        events.addRegionEventListener("mousedown", function() {
+            changeScreen(screen);
+        });
+        events.addRegionEventListener("mousemove", function () {
+            document.body.style.cursor = "pointer";
+        });
+        events.closeRegion();
 
-	}
-
-	function eventArrow(screen) {
-	    // transition arrows to get out of object closeups are always in the same place
     }
 	function getItemEvent(x,y,width,height,toDo){
 
 			events.beginRegion();
 			events.context.beginPath();
-			events.context.fillStyle = "#00D2FF";
-			//events.context.strokeStyle="#000000";
+//			events.context.fillStyle = "#00D2FF";
+//			events.context.strokeStyle="#000000";
 			//events.context.lineWidth=5;
 			events.context.rect(x,y,width,height);
-			events.context.fill();
+//			events.context.fill();
 			//events.context.stroke();
 			events.context.closePath();
 			events.addRegionEventListener("mousedown",function(){
@@ -484,7 +492,7 @@ body{
 
 							if(monsterAlive){
 								if(hasWeapon){
-									message.displayMess("Used weapon on monster");
+									message.displayMess("Killed monster with weapon!");
 									//play monster dying sound
 									monsterdeath.play();
 									//kill monster
@@ -509,6 +517,7 @@ body{
 
 				}
 				else{
+                    lockedSound.play();
 					message.displayMess("You need a key");
 				}
 
@@ -518,6 +527,7 @@ body{
 			}
 		}
 		else{
+            lockedSound.play();
 			message.displayMess("You need a key");
 		}
 
@@ -764,25 +774,7 @@ body{
 		};
 
 	}
-	    // if they click on the bedroom door AFTER they are at the close up view (not if they are just inside the hallway still)
-    function attemptUnlockUpCloseBedroomDoor(canvas,context) {
-        if (hasBedroomKey && hasWeapon) {
-                context.drawImage(images["opendoor"], 0, 0, canvas.width, canvas.height);
 
-            // then play the video of beating the monster and getting the key
-        } else if (hasBedroomKey && ! hasWeapon) {
-            context.drawImage(images["monster"], 0, 0, canvas.width, canvas.height);
-
-            // then play the video of getting killed by the monster
-
-            // then take user to end screen
-			context.drawImage(images["SCREENMONSTER"], 0, 0, canvas.width, canvas.height);
-
-
-        } else {
-            // play some kind of "locked door" sound, display text of "door is locked"
-        }
-    }
 	function createScreens(){
 		//for puzzle
 		var draggingRect = [false,false,false,false,false,false,false,false,false];
@@ -806,7 +798,7 @@ body{
 
 				if(lampOn){
 					firestring = "fire"+fireCount;
-					events.context.drawImage(images["livingroom"], 0, 0, events.canvas.width, events.canvas.height);
+					events.context.drawImage(images["final"], 0, 0, events.canvas.width, events.canvas.height);
 					if(puzzleComplete){
 						events.context.drawImage(images["puzzleboxwpiecescomplete"], 440, 370, 120, 120);
 					}
@@ -817,10 +809,10 @@ body{
 				else {
 					firestring = "fire"+fireCount+"dark";
 					if (hasStick) {
-						events.context.drawImage(images["lampwithoutstick"], 0, 0, events.canvas.width, events.canvas.height);
+						events.context.drawImage(images["inthedarkup"], 0, 0, events.canvas.width, events.canvas.height);
 					}
 					else{
-						events.context.drawImage(images["lamplightingafter"], 0, 0, events.canvas.width, events.canvas.height);
+						events.context.drawImage(images["inthedark2up"], 0, 0, events.canvas.width, events.canvas.height);
 					}
 					if(puzzleComplete){
 						events.context.drawImage(images["puzzleboxwpiecescompletedark"], 440, 370, 120, 120);
@@ -978,7 +970,7 @@ body{
 						}
 					}
 					else{
-						events.context.drawImage(images["closeddoor"], 0, 0, events.canvas.width, events.canvas.height);
+						events.context.drawImage(images["deathdoor"], 0, 0, events.canvas.width, events.canvas.height);
 					}
 
 				}
@@ -988,15 +980,15 @@ body{
 			function(){
 				events.context.drawImage(images["SCREENWIN"], 0, 0, events.canvas.width, events.canvas.height);
 				//draw time
-				var text = timer.getTimeString();
+				var text = timer.getTimeString() + " Remaining";
 
 				events.context.save();
 				events.context.font = '60pt Georgia';
 				events.context.lineWidth = 3;
 				events.context.strokeStyle = "black";
 				events.context.fillStyle= "white";
-				events.context.fillText(text, 400,500);
-				events.context.strokeText(text, 400,500);
+				events.context.fillText(text, 100,500);
+				events.context.strokeText(text, 100,500);
 				events.context.restore();
 			},
 			//death by monster draw
@@ -1018,7 +1010,7 @@ body{
 			function(){
 				createEventBox(500,32,67,75,3);
 				createEventBox(510, 150, 130, 20, 4);
-				createEventBox(0,0,100,50,0);
+//				createEventBox(0,0,100,50,0); //debugging region
 				createEventShape(880,0,1000,0,1000,360,880,260,6);
 				createEventShape(7,520,229,385,265,416,77,590,5);
 				createEventBox(400,380,220,120,2);
@@ -1031,6 +1023,7 @@ body{
 						currentScreen = 8;
 					}
 					else{
+                        lockedSound.play();
 						message.displayMess("You need a key");
 					}
 
@@ -1045,6 +1038,7 @@ body{
 						var stickH = 40;
 
 						getItemEvent(stickX,stickY,stickW,stickH,function(){
+						    bing.play();
 							message.displayMess("You found a xylophone stick");
 							hasStick = true;
 							lampOn = !lampOn;
@@ -1066,18 +1060,20 @@ body{
 				if(!hasWeapon){
 					getItemEvent( 350, 170, 30, 120,function(){
 						hasWeapon = true;
+                        bing.play();
 						message.displayMess("You found a weapon!");
 					});
 				}
 			},
 			//puzzle events
 			function(){
-				createEventBox(0,0,100,50,1);
+                eventArrow(900, 630, 1);
 				//event to get key
 				if(puzzleComplete&&!hasDrawerKey){
 					getItemEvent(puzzleKeyX, puzzleKeyY, 100,100,function(){
 						hasDrawerKey = true;
-						message.displayMess("You got the drawer key");
+                        bing.play();
+						message.displayMess("You found a key!");
 					});
 				}
 
@@ -1131,7 +1127,8 @@ body{
 							//check if all of the pieces are correct
 							if(check == 9){
 								//pieces are organized
-								message.displayMess("You solved the puzzle");
+								message.displayMess("You solved the puzzle!");
+                                openShuffle.play();
 								check = 0;
 								puzzleComplete = true;
 								var puzzleKeyAnim = setInterval(function(){
@@ -1165,6 +1162,7 @@ body{
 			//portrait events
 			function(){
 				if(safeOpen){
+                    eventArrow(900, 640, 1);
 					getItemEvent(0,0,480,700,function(){
 						openShuffle.play();
 						portraitOpen = !portraitOpen;
@@ -1176,11 +1174,13 @@ body{
 
 						getItemEvent(650, 220, 200, 200,function(){
 							hasBedroomKey = true;
-							message.displayMess("You found the bedroom key");
+                            bing.play();
+							message.displayMess("You found a key!");
 						});
 					}
 				}
 				else if(portraitOpen){
+                    eventArrow(900, 640, 1);
 					getItemEvent(0,0,480,700,function(){
 						openShuffle.play();
 						portraitOpen = !portraitOpen;
@@ -1208,7 +1208,8 @@ body{
 						}
 						else{
 							//play error sound
-							bing.play();
+//							bing.play();
+                            wrongPass.play();
 						}
 					});
 					//button events
@@ -1222,7 +1223,7 @@ body{
 					getItemEvent(860,355,70,70,function(){newInputPortrait(false,3);});
 				}
 				else{
-					createEventBox(0,0,480,700,1);
+                    eventArrow(900, 640, 1);
 					//to open portrait
 					getItemEvent(490,60,500,550,function(){
 						openShuffle.play();
@@ -1237,7 +1238,7 @@ body{
 			//drawer events
 			function(){
 				if(!drawerOpening){
-					createEventBox(0,0,1000,100,1); // BACK BUTTON
+                    eventArrow(900, 630, 1);
 					if (!drawerOpen) {
 						//draw event shape on the location for the drawer closed
 						getItemEvent(240, 370, 520, 100, function(){
@@ -1249,6 +1250,7 @@ body{
 								setTimeout(function(){ drawerOpening = false; }, 500);
 							}
 							else{
+                                lockedSound.play();
 								message.displayMess("You need a key");
 							}
 						});
@@ -1271,13 +1273,11 @@ body{
 			//xylophone events
 			function(){
 
-
-
 				if(xylophoneOpen){
-					xylophoneEventShape(0,0,1000,0,1000,150,0,75,1);
+                    eventArrow(900, 50, 1);
 				}
 				else{
-					xylophoneEventShape(0,0,1000,0,1000,320,0,320,1);
+                    eventArrow(900, 50, 1);
 				}
 				//get xylophone coordinates
 
@@ -1293,7 +1293,6 @@ body{
 					stickY = posi.y ;
 				});
 				events.closeRegion();
-
 
 
 				events.beginRegion();
@@ -1331,22 +1330,23 @@ body{
 			},
 			//hallway events
 			function(){
-				createEventBox(670,40,200,550,7);
-				createEventBox(0,0,100,50,0);
-				createEventBox(0,450,430,250,1);
+                createEventShape(670, 40, 860, 210, 850, 590, 665, 440, 7); // bedroom door event region
+//				createEventBox(0,0,100,50,0); // debugging event
+                createEventShape(190, 380, 550, 700, 0, 700, 0, 630, 1); // stairs event region
 			},
 			//bedroom events
 			function(){
 				if(!bedroomOpening&&!bedroomOpening2){
-					createEventBox(0,0,100,50,0);
-					createEventBox(0,550,1000,150,6);
+//					createEventBox(0,0,100,50,0); // debugging event
+                    eventArrow(900, 630, 6);
 					if(bedroomOpen){
 						//change coordinates to correct door location
 						getItemEvent(670, 10, 310, 530,function(){toggledoor();});
 						if(!hasMainKey){
 							getItemEvent(460, 400, 100,100,function(){
 								hasMainKey = true;
-								message.displayMess("You found the front door key!");
+                                bing.play();
+								message.displayMess("You found a key!");
 							});
 						}
 					}
