@@ -352,8 +352,30 @@ body{
 
 	// transition arrows to get out of close up views of objects
 	function eventArrow(x, y, screen) {
-        events.context.fillStyle = "#00D2FF";
+        //events.context.fillStyle = "#00D2FF";
         events.beginRegion();
+        events.context.beginPath();
+        events.context.moveTo(x, y);
+        events.context.lineTo(x + 40, y);
+        events.context.lineTo(x + 40, y + 13);
+        events.context.lineTo(x + 58, y - 8);
+        events.context.lineTo(x + 40, y - 25);
+        events.context.lineTo(x + 40, y - 13);
+        events.context.lineTo(x, y - 13);
+        events.context.lineTo(x, y);
+       // events.context.fill();
+        events.context.closePath();
+        events.addRegionEventListener("mousedown", function() {
+            changeScreen(screen);
+        });
+        events.addRegionEventListener("mousemove", function () {
+            document.body.style.cursor = "pointer";
+        });
+        events.closeRegion();
+
+    }
+	function drawArrow(x, y) {
+        events.context.fillStyle = "#00D2FF";
         events.context.beginPath();
         events.context.moveTo(x, y);
         events.context.lineTo(x + 40, y);
@@ -365,14 +387,6 @@ body{
         events.context.lineTo(x, y);
         events.context.fill();
         events.context.closePath();
-        events.addRegionEventListener("mousedown", function() {
-            changeScreen(screen);
-        });
-        events.addRegionEventListener("mousemove", function () {
-            document.body.style.cursor = "pointer";
-        });
-        events.closeRegion();
-
     }
 	function getItemEvent(x,y,width,height,toDo){
 
@@ -864,6 +878,7 @@ body{
 					events.context.drawImage(images[i], puzx[i], puzy[i], piecewidth, piecewidth);
 				}
 
+				drawArrow(900, 630);
 			},
 			//Portrait draw
 			function(){
@@ -885,7 +900,7 @@ body{
 				else{
 					events.context.drawImage(images["portraitclose"], 0, 0, events.canvas.width, events.canvas.height);
 				}
-
+				drawArrow(900, 640);
 			},
 			//Drawer draw
 			function(){
@@ -902,6 +917,7 @@ body{
 						events.context.fillText(noteString, 400, 550);
 
 				}
+				drawArrow(900, 630);
 			},
 			//xylophone draw
 			function(){
@@ -933,7 +949,7 @@ body{
 					drawStick(stickX,stickY);
 				}
 
-
+				drawArrow(900, 50);
 			},
 			//hallway Draw
 			function(){
@@ -974,7 +990,7 @@ body{
 					}
 
 				}
-
+				drawArrow(900, 630);
 			},
 			//win screen draw
 			function(){
@@ -1397,7 +1413,10 @@ body{
 		createScreens(); //create function arrays to handle drawing and events
 
 		document.addEventListener("keypress", function(event) {
-			toolbox = !toolbox;
+			if(currentScreen>0 && currentScreen<8){
+				toolbox = !toolbox;
+			}
+			
 		});
 
 		events.setStage(function () {
@@ -1440,7 +1459,7 @@ body{
 
 			this.clear();
 			screens[currentScreen]();
-			drawEvents[currentScreen]();	//for debug
+			//drawEvents[currentScreen]();	//for debug
 
 			if(toolbox && currentScreen > 0 && currentScreen < 8){
 				//draw toolbox
