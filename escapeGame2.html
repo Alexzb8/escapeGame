@@ -999,12 +999,12 @@ body{
 				var text = timer.getTimeString() + " Remaining";
 
 				events.context.save();
-				events.context.font = '60pt Georgia';
+				events.context.font = '50pt Georgia';
 				events.context.lineWidth = 3;
 				events.context.strokeStyle = "black";
 				events.context.fillStyle= "white";
-				events.context.fillText(text, 100,500);
-				events.context.strokeText(text, 100,500);
+				events.context.fillText(text, 210,500);
+				events.context.strokeText(text, 210,500);
 				events.context.restore();
 			},
 			//death by monster draw
@@ -1416,7 +1416,7 @@ body{
 			if(currentScreen>0 && currentScreen<8){
 				toolbox = !toolbox;
 			}
-			
+
 		});
 
 		events.setStage(function () {
